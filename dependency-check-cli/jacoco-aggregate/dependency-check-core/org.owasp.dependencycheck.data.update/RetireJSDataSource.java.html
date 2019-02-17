@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../jacoco-resources/report.gif" type="image/gif"/><title>RetireJSDataSource.java</title><link rel="stylesheet" href="../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../index.html" class="el_report">Dependency-Check Command Line</a> &gt; <a href="../index.html" class="el_bundle">dependency-check-core</a> &gt; <a href="index.source.html" class="el_package">org.owasp.dependencycheck.data.update</a> &gt; <span class="el_source">RetireJSDataSource.java</span></div><h1>RetireJSDataSource.java</h1><pre class="source lang-java linenums">/*
+ * This file is part of dependency-check-core.
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ * Copyright (c) 2018 Jeremy Long. All Rights Reserved.
+ */
+package org.owasp.dependencycheck.data.update;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
+import javax.annotation.concurrent.ThreadSafe;
+import org.apache.commons.io.IOUtils;
+import org.owasp.dependencycheck.Engine;
+import org.owasp.dependencycheck.data.update.exception.UpdateException;
+import org.owasp.dependencycheck.utils.InvalidSettingException;
+import org.owasp.dependencycheck.utils.Settings;
+import org.owasp.dependencycheck.utils.URLConnectionFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+/**
+ * Checks the gh-pages dependency-check site to determine the current released
+ * version number. If the released version number is greater than the running
+ * version number a warning is printed recommending that an upgrade be
+ * performed.
+ *
+ * @author Jeremy Long
+ */
+@ThreadSafe
+public class RetireJSDataSource implements CachedWebDataSource {
+
+    /**
+     * Static logger.
+     */
+<span class="fc" id="L53">    private static final Logger LOGGER = LoggerFactory.getLogger(RetireJSDataSource.class);</span>
+    /**
+     * The property key indicating when the last update occurred.
+     */
+    public static final String RETIREJS_UPDATED_ON = &quot;RetireJSUpdatedOn&quot;;
+    /**
+     * The configured settings.
+     */
+    private Settings settings;
+    /**
+     * The default URL to the RetireJS JavaScript repository.
+     */
+    private static final String DEFAULT_JS_URL = &quot;https://raw.githubusercontent.com/Retirejs/retire.js/master/repository/jsrepository.json&quot;;
+
+    /**
+     * Constructs a new engine version check utility for testing.
+     *
+     * @param settings the configured settings
+     */
+<span class="nc" id="L72">    protected RetireJSDataSource(Settings settings) {</span>
+<span class="nc" id="L73">        this.settings = settings;</span>
+<span class="nc" id="L74">    }</span>
+
+    /**
+     * Constructs a new engine version check utility.
+     */
+<span class="fc" id="L79">    public RetireJSDataSource() {</span>
+<span class="fc" id="L80">    }</span>
+
+    /**
+     * Downloads the current RetireJS data source.
+     *
+     * @throws UpdateException thrown if the update failed
+     */
+    @Override
+    public void update(Engine engine) throws UpdateException {
+<span class="fc" id="L89">        this.settings = engine.getSettings();</span>
+<span class="fc" id="L90">        String url = null;</span>
+        try {
+<span class="fc" id="L92">            final boolean autoupdate = settings.getBoolean(Settings.KEYS.AUTO_UPDATE, true);</span>
+<span class="fc" id="L93">            final boolean enabled = settings.getBoolean(Settings.KEYS.ANALYZER_RETIREJS_ENABLED, true);</span>
+<span class="fc" id="L94">            final File repoFile = new File(settings.getDataDirectory(), &quot;jsrepository.json&quot;);</span>
+<span class="pc bpc" id="L95" title="3 of 6 branches missed.">            final boolean proceed = enabled &amp;&amp; autoupdate &amp;&amp; shouldUpdagte(repoFile);</span>
+<span class="pc bpc" id="L96" title="1 of 2 branches missed.">            if (proceed) {</span>
+<span class="fc" id="L97">                LOGGER.debug(&quot;Begin RetireJS Update&quot;);</span>
+<span class="fc" id="L98">                url = settings.getString(Settings.KEYS.ANALYZER_RETIREJS_REPO_JS_URL, DEFAULT_JS_URL);</span>
+<span class="fc" id="L99">                initializeRetireJsRepo(settings, new URL(url));</span>
+            }
+<span class="nc" id="L101">        } catch (InvalidSettingException ex) {</span>
+<span class="nc" id="L102">            throw new UpdateException(&quot;Unable to determine if autoupdate is enabled&quot;, ex);</span>
+<span class="nc" id="L103">        } catch (MalformedURLException ex) {</span>
+<span class="nc" id="L104">            throw new UpdateException(String.format(&quot;Inavlid URL for RetireJS repository (%s)&quot;, url), ex);</span>
+<span class="nc" id="L105">        } catch (IOException ex) {</span>
+<span class="nc" id="L106">            throw new UpdateException(&quot;Unable to get the data directory&quot;, ex);</span>
+<span class="fc" id="L107">        }</span>
+<span class="fc" id="L108">    }</span>
+
+    /**
+     * Determines if the we should update the RetireJS database.
+     *
+     * @param repo the retire JS repository.
+     * @return &lt;code&gt;true&lt;/code&gt; if an updated to the RetireJS database should
+     * be performed; otherwise &lt;code&gt;false&lt;/code&gt;
+     * @throws NumberFormatException thrown if an invalid value is contained in
+     * the database properties
+     */
+    protected boolean shouldUpdagte(File repo) throws NumberFormatException {
+<span class="fc" id="L120">        boolean proceed = true;</span>
+<span class="pc bpc" id="L121" title="1 of 4 branches missed.">        if (repo != null &amp;&amp; repo.isFile()) {</span>
+<span class="fc" id="L122">            final int validForHours = settings.getInt(Settings.KEYS.ANALYZER_RETIREJS_REPO_VALID_FOR_HOURS, 0);</span>
+<span class="fc" id="L123">            final long lastUpdatedOn = repo.lastModified();</span>
+<span class="fc" id="L124">            final long now = System.currentTimeMillis();</span>
+<span class="fc" id="L125">            LOGGER.debug(&quot;Last updated: {}&quot;, lastUpdatedOn);</span>
+<span class="fc" id="L126">            LOGGER.debug(&quot;Now: {}&quot;, now);</span>
+<span class="fc" id="L127">            final long msValid = validForHours * 60L * 60L * 1000L;</span>
+<span class="pc bpc" id="L128" title="1 of 2 branches missed.">            proceed = (now - lastUpdatedOn) &gt; msValid;</span>
+<span class="pc bpc" id="L129" title="1 of 2 branches missed.">            if (!proceed) {</span>
+<span class="nc" id="L130">                LOGGER.info(&quot;Skipping RetireJS update since last update was within {} hours.&quot;, validForHours);</span>
+            }
+        }
+<span class="fc" id="L133">        return proceed;</span>
+    }
+
+    /**
+     * Initializes the local RetireJS repository
+     *
+     * @param settings a reference to the dependency-check settings
+     * @param repoUrl the URL to the RetireJS repo to use
+     * @throws UpdateException thrown if there is an exception during
+     * initialization
+     */
+    private void initializeRetireJsRepo(Settings settings, URL repoUrl) throws UpdateException {
+        try {
+<span class="fc" id="L146">            final File dataDir = settings.getDataDirectory();</span>
+<span class="fc" id="L147">            final File tmpDir = settings.getTempDirectory();</span>
+<span class="fc" id="L148">            boolean useProxy = false;</span>
+<span class="pc bpc" id="L149" title="1 of 2 branches missed.">            if (null != settings.getString(Settings.KEYS.PROXY_SERVER)) {</span>
+<span class="nc" id="L150">                useProxy = true;</span>
+<span class="nc" id="L151">                LOGGER.debug(&quot;Using proxy&quot;);</span>
+            }
+<span class="fc" id="L153">            LOGGER.debug(&quot;RetireJS Repo URL: {}&quot;, repoUrl.toExternalForm());</span>
+<span class="fc" id="L154">            final URLConnectionFactory factory = new URLConnectionFactory(settings);</span>
+<span class="fc" id="L155">            final HttpURLConnection conn = factory.createHttpURLConnection(repoUrl, useProxy);</span>
+<span class="fc" id="L156">            final String filename = repoUrl.getFile().substring(repoUrl.getFile().lastIndexOf(&quot;/&quot;) + 1, repoUrl.getFile().length());</span>
+<span class="pc bpc" id="L157" title="1 of 2 branches missed.">            if (conn.getResponseCode() == HttpURLConnection.HTTP_OK) {</span>
+<span class="fc" id="L158">                final File tmpFile = new File(tmpDir, filename);</span>
+<span class="fc" id="L159">                final File repoFile = new File(dataDir, filename);</span>
+<span class="fc" id="L160">                try (InputStream inputStream = conn.getInputStream();</span>
+<span class="fc" id="L161">                        FileOutputStream outputStream = new FileOutputStream(tmpFile)) {</span>
+<span class="fc" id="L162">                    IOUtils.copy(inputStream, outputStream);</span>
+                }
+                //using move fails if target and destination are on different disks which does happen (see #1394 and #1404)
+<span class="fc" id="L165">                Files.copy(tmpFile.toPath(), repoFile.toPath(), StandardCopyOption.REPLACE_EXISTING);</span>
+<span class="pc bpc" id="L166" title="1 of 2 branches missed.">                if (!tmpFile.delete()) {</span>
+<span class="nc" id="L167">                    tmpFile.deleteOnExit();</span>
+                }
+            }
+<span class="nc" id="L170">        } catch (IOException e) {</span>
+<span class="nc" id="L171">            throw new UpdateException(&quot;Failed to initialize the RetireJS repo&quot;, e);</span>
+<span class="fc" id="L172">        }</span>
+<span class="fc" id="L173">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.2.201808211720</span></div></body></html>

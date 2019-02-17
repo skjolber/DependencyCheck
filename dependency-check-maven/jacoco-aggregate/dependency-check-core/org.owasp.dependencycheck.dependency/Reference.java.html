@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../jacoco-resources/report.gif" type="image/gif"/><title>Reference.java</title><link rel="stylesheet" href="../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../index.html" class="el_report">Dependency-Check Maven Plugin</a> &gt; <a href="../index.html" class="el_bundle">dependency-check-core</a> &gt; <a href="index.source.html" class="el_package">org.owasp.dependencycheck.dependency</a> &gt; <span class="el_source">Reference.java</span></div><h1>Reference.java</h1><pre class="source lang-java linenums">/*
+ * This file is part of dependency-check-core.
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ * Copyright (c) 2012 Jeremy Long. All Rights Reserved.
+ */
+package org.owasp.dependencycheck.dependency;
+
+import java.io.Serializable;
+import javax.annotation.concurrent.ThreadSafe;
+import org.apache.commons.lang3.builder.CompareToBuilder;
+
+/**
+ * An external reference for a vulnerability. This contains a name, URL, and a
+ * source.
+ *
+ * @author Jeremy Long
+ */
+@ThreadSafe
+<span class="fc" id="L31">public class Reference implements Serializable, Comparable&lt;Reference&gt; {</span>
+
+    /**
+     * the serial version uid.
+     */
+    private static final long serialVersionUID = -3444464824563008021L;
+    /**
+     * The name of the reference.
+     */
+    private String name;
+    /**
+     * the url for the reference.
+     */
+    private String url;
+    /**
+     * the source of the reference.
+     */
+    private String source;
+
+    /**
+     * Get the value of name.
+     *
+     * @return the value of name
+     */
+    public String getName() {
+<span class="fc" id="L56">        return name;</span>
+    }
+
+    /**
+     * Set the value of name.
+     *
+     * @param name new value of name
+     */
+    public void setName(String name) {
+<span class="fc" id="L65">        this.name = name;</span>
+<span class="fc" id="L66">    }</span>
+
+    /**
+     * Get the value of url.
+     *
+     * @return the value of url
+     */
+    public String getUrl() {
+<span class="fc" id="L74">        return url;</span>
+    }
+
+    /**
+     * Set the value of url.
+     *
+     * @param url new value of url
+     */
+    public void setUrl(String url) {
+<span class="fc" id="L83">        this.url = url;</span>
+<span class="fc" id="L84">    }</span>
+
+    /**
+     * Get the value of source.
+     *
+     * @return the value of source
+     */
+    public String getSource() {
+<span class="fc" id="L92">        return source;</span>
+    }
+
+    /**
+     * Set the value of source.
+     *
+     * @param source new value of source
+     */
+    public void setSource(String source) {
+<span class="fc" id="L101">        this.source = source;</span>
+<span class="fc" id="L102">    }</span>
+
+    @Override
+    public String toString() {
+<span class="nc" id="L106">        return &quot;Reference: { name='&quot; + this.name + &quot;', url='&quot; + this.url + &quot;', source='&quot; + this.source + &quot;' }&quot;;</span>
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+<span class="nc bnc" id="L111" title="All 2 branches missed.">        if (obj == null) {</span>
+<span class="nc" id="L112">            return false;</span>
+        }
+<span class="nc bnc" id="L114" title="All 2 branches missed.">        if (!(obj instanceof Reference)) {</span>
+<span class="nc" id="L115">            return false;</span>
+        }
+<span class="nc" id="L117">        final Reference other = (Reference) obj;</span>
+<span class="nc bnc" id="L118" title="All 6 branches missed.">        if ((this.name == null) ? (other.name != null) : !this.name.equals(other.name)) {</span>
+<span class="nc" id="L119">            return false;</span>
+        }
+<span class="nc bnc" id="L121" title="All 6 branches missed.">        if ((this.url == null) ? (other.url != null) : !this.url.equals(other.url)) {</span>
+<span class="nc" id="L122">            return false;</span>
+        }
+<span class="nc bnc" id="L124" title="All 6 branches missed.">        return !((this.source == null) ? (other.source != null) : !this.source.equals(other.source));</span>
+    }
+
+    @Override
+    public int hashCode() {
+<span class="fc" id="L129">        int hash = 5;</span>
+<span class="pc bpc" id="L130" title="1 of 2 branches missed.">        hash = 67 * hash + (this.name != null ? this.name.hashCode() : 0);</span>
+<span class="pc bpc" id="L131" title="1 of 2 branches missed.">        hash = 67 * hash + (this.url != null ? this.url.hashCode() : 0);</span>
+<span class="pc bpc" id="L132" title="1 of 2 branches missed.">        hash = 67 * hash + (this.source != null ? this.source.hashCode() : 0);</span>
+<span class="fc" id="L133">        return hash;</span>
+    }
+
+    /**
+     * Implementation of the comparable interface.
+     *
+     * @param o the Reference being compared
+     * @return an integer indicating the ordering of the two objects
+     */
+    @Override
+    public int compareTo(Reference o) {
+<span class="fc" id="L144">        return new CompareToBuilder()</span>
+<span class="fc" id="L145">                .append(source, o.source)</span>
+<span class="fc" id="L146">                .append(name, o.name)</span>
+<span class="fc" id="L147">                .append(url, o.url)</span>
+<span class="fc" id="L148">                .toComparison();</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.2.201808211720</span></div></body></html>

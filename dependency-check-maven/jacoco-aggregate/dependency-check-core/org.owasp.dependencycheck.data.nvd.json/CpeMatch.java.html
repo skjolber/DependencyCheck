@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../jacoco-resources/report.gif" type="image/gif"/><title>CpeMatch.java</title><link rel="stylesheet" href="../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../index.html" class="el_report">Dependency-Check Maven Plugin</a> &gt; <a href="../index.html" class="el_bundle">dependency-check-core</a> &gt; <a href="index.source.html" class="el_package">org.owasp.dependencycheck.data.nvd.json</a> &gt; <span class="el_source">CpeMatch.java</span></div><h1>CpeMatch.java</h1><pre class="source lang-java linenums">
+package org.owasp.dependencycheck.data.nvd.json;
+
+import java.util.ArrayList;
+import java.util.List;
+import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+
+
+/**
+ * CPE match string or range
+ * 
+ */
+<span class="fc" id="L17">public class CpeMatch {</span>
+
+    /**
+     * 
+     * (Required)
+     * 
+     */
+    @SerializedName(&quot;vulnerable&quot;)
+    @Expose
+    private Boolean vulnerable;
+    @SerializedName(&quot;cpe22Uri&quot;)
+    @Expose
+    private String cpe22Uri;
+    /**
+     * 
+     * (Required)
+     * 
+     */
+    @SerializedName(&quot;cpe23Uri&quot;)
+    @Expose
+    private String cpe23Uri;
+    @SerializedName(&quot;versionStartExcluding&quot;)
+    @Expose
+    private String versionStartExcluding;
+    @SerializedName(&quot;versionStartIncluding&quot;)
+    @Expose
+    private String versionStartIncluding;
+    @SerializedName(&quot;versionEndExcluding&quot;)
+    @Expose
+    private String versionEndExcluding;
+    @SerializedName(&quot;versionEndIncluding&quot;)
+    @Expose
+    private String versionEndIncluding;
+<span class="fc" id="L50">    @SerializedName(&quot;cpe_name&quot;)</span>
+    @Expose
+    private List&lt;CpeName&gt; cpeName = new ArrayList&lt;CpeName&gt;();
+
+    /**
+     * 
+     * (Required)
+     * 
+     */
+    public Boolean getVulnerable() {
+<span class="fc" id="L60">        return vulnerable;</span>
+    }
+
+    /**
+     * 
+     * (Required)
+     * 
+     */
+    public void setVulnerable(Boolean vulnerable) {
+<span class="nc" id="L69">        this.vulnerable = vulnerable;</span>
+<span class="nc" id="L70">    }</span>
+
+    public String getCpe22Uri() {
+<span class="nc" id="L73">        return cpe22Uri;</span>
+    }
+
+    public void setCpe22Uri(String cpe22Uri) {
+<span class="nc" id="L77">        this.cpe22Uri = cpe22Uri;</span>
+<span class="nc" id="L78">    }</span>
+
+    /**
+     * 
+     * (Required)
+     * 
+     */
+    public String getCpe23Uri() {
+<span class="fc" id="L86">        return cpe23Uri;</span>
+    }
+
+    /**
+     * 
+     * (Required)
+     * 
+     */
+    public void setCpe23Uri(String cpe23Uri) {
+<span class="nc" id="L95">        this.cpe23Uri = cpe23Uri;</span>
+<span class="nc" id="L96">    }</span>
+
+    public String getVersionStartExcluding() {
+<span class="fc" id="L99">        return versionStartExcluding;</span>
+    }
+
+    public void setVersionStartExcluding(String versionStartExcluding) {
+<span class="nc" id="L103">        this.versionStartExcluding = versionStartExcluding;</span>
+<span class="nc" id="L104">    }</span>
+
+    public String getVersionStartIncluding() {
+<span class="fc" id="L107">        return versionStartIncluding;</span>
+    }
+
+    public void setVersionStartIncluding(String versionStartIncluding) {
+<span class="nc" id="L111">        this.versionStartIncluding = versionStartIncluding;</span>
+<span class="nc" id="L112">    }</span>
+
+    public String getVersionEndExcluding() {
+<span class="fc" id="L115">        return versionEndExcluding;</span>
+    }
+
+    public void setVersionEndExcluding(String versionEndExcluding) {
+<span class="nc" id="L119">        this.versionEndExcluding = versionEndExcluding;</span>
+<span class="nc" id="L120">    }</span>
+
+    public String getVersionEndIncluding() {
+<span class="fc" id="L123">        return versionEndIncluding;</span>
+    }
+
+    public void setVersionEndIncluding(String versionEndIncluding) {
+<span class="nc" id="L127">        this.versionEndIncluding = versionEndIncluding;</span>
+<span class="nc" id="L128">    }</span>
+
+    public List&lt;CpeName&gt; getCpeName() {
+<span class="nc" id="L131">        return cpeName;</span>
+    }
+
+    public void setCpeName(List&lt;CpeName&gt; cpeName) {
+<span class="nc" id="L135">        this.cpeName = cpeName;</span>
+<span class="nc" id="L136">    }</span>
+
+    @Override
+    public String toString() {
+<span class="nc" id="L140">        return new ToStringBuilder(this).append(&quot;vulnerable&quot;, vulnerable).append(&quot;cpe22Uri&quot;, cpe22Uri).append(&quot;cpe23Uri&quot;, cpe23Uri).append(&quot;versionStartExcluding&quot;, versionStartExcluding).append(&quot;versionStartIncluding&quot;, versionStartIncluding).append(&quot;versionEndExcluding&quot;, versionEndExcluding).append(&quot;versionEndIncluding&quot;, versionEndIncluding).append(&quot;cpeName&quot;, cpeName).toString();</span>
+    }
+
+    @Override
+    public int hashCode() {
+<span class="nc" id="L145">        return new HashCodeBuilder().append(vulnerable).append(cpe23Uri).append(versionStartExcluding).append(cpe22Uri).append(versionEndExcluding).append(cpeName).append(versionEndIncluding).append(versionStartIncluding).toHashCode();</span>
+    }
+
+    @Override
+    public boolean equals(Object other) {
+<span class="nc bnc" id="L150" title="All 2 branches missed.">        if (other == this) {</span>
+<span class="nc" id="L151">            return true;</span>
+        }
+<span class="nc bnc" id="L153" title="All 2 branches missed.">        if ((other instanceof CpeMatch) == false) {</span>
+<span class="nc" id="L154">            return false;</span>
+        }
+<span class="nc" id="L156">        CpeMatch rhs = ((CpeMatch) other);</span>
+<span class="nc" id="L157">        return new EqualsBuilder().append(vulnerable, rhs.vulnerable).append(cpe23Uri, rhs.cpe23Uri).append(versionStartExcluding, rhs.versionStartExcluding).append(cpe22Uri, rhs.cpe22Uri).append(versionEndExcluding, rhs.versionEndExcluding).append(cpeName, rhs.cpeName).append(versionEndIncluding, rhs.versionEndIncluding).append(versionStartIncluding, rhs.versionStartIncluding).isEquals();</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.2.201808211720</span></div></body></html>

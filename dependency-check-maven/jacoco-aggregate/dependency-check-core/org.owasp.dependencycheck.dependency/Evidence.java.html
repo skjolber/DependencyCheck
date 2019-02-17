@@ -1,0 +1,264 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../jacoco-resources/report.gif" type="image/gif"/><title>Evidence.java</title><link rel="stylesheet" href="../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../index.html" class="el_report">Dependency-Check Maven Plugin</a> &gt; <a href="../index.html" class="el_bundle">dependency-check-core</a> &gt; <a href="index.source.html" class="el_package">org.owasp.dependencycheck.dependency</a> &gt; <span class="el_source">Evidence.java</span></div><h1>Evidence.java</h1><pre class="source lang-java linenums">/*
+ * This file is part of dependency-check-core.
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ * Copyright (c) 2012 Jeremy Long. All Rights Reserved.
+ */
+package org.owasp.dependencycheck.dependency;
+
+import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
+import java.io.Serializable;
+import javax.annotation.concurrent.ThreadSafe;
+
+/**
+ * Evidence is a piece of information about a Dependency.
+ *
+ * @author Jeremy Long
+ */
+@ThreadSafe
+public class Evidence implements Serializable, Comparable&lt;Evidence&gt; {
+
+    /**
+     * The serial version UID for serialization.
+     */
+    private static final long serialVersionUID = 2402386455919067874L;
+    /**
+     * Used as starting point for generating the value in {@link #hashCode()}.
+     */
+    private static final int MAGIC_HASH_INIT_VALUE = 3;
+    /**
+     * Used as a multiplier for generating the value in {@link #hashCode()}.
+     */
+    private static final int MAGIC_HASH_MULTIPLIER = 67;
+
+    /**
+     * The name of the evidence.
+     */
+    private String name;
+
+    /**
+     * The source of the evidence.
+     */
+    private String source;
+
+    /**
+     * The value of the evidence.
+     */
+    private String value;
+
+    /**
+     * The confidence level for the evidence.
+     */
+    private Confidence confidence;
+
+    /**
+     * Creates a new Evidence object.
+     */
+<span class="nc" id="L71">    public Evidence() {</span>
+<span class="nc" id="L72">    }</span>
+
+    /**
+     * Creates a new Evidence objects.
+     *
+     * @param source the source of the evidence.
+     * @param name the name of the evidence.
+     * @param value the value of the evidence.
+     * @param confidence the confidence of the evidence.
+     */
+<span class="fc" id="L82">    public Evidence(String source, String name, String value, Confidence confidence) {</span>
+<span class="fc" id="L83">        this.source = source;</span>
+<span class="fc" id="L84">        this.name = name;</span>
+<span class="fc" id="L85">        this.value = value;</span>
+<span class="fc" id="L86">        this.confidence = confidence;</span>
+<span class="fc" id="L87">    }</span>
+
+    /**
+     * Get the value of name.
+     *
+     * @return the value of name
+     */
+    public String getName() {
+<span class="fc" id="L95">        return name;</span>
+    }
+
+    /**
+     * Set the value of name.
+     *
+     * @param name new value of name
+     */
+    public void setName(String name) {
+<span class="nc" id="L104">        this.name = name;</span>
+<span class="nc" id="L105">    }</span>
+
+    /**
+     * Get the value of source.
+     *
+     * @return the value of source
+     */
+    public String getSource() {
+<span class="fc" id="L113">        return source;</span>
+    }
+
+    /**
+     * Set the value of source.
+     *
+     * @param source new value of source
+     */
+    public void setSource(String source) {
+<span class="nc" id="L122">        this.source = source;</span>
+<span class="nc" id="L123">    }</span>
+
+    /**
+     * Get the value of value.
+     *
+     * @return the value of value
+     */
+    public String getValue() {
+<span class="fc" id="L131">        return value;</span>
+    }
+
+    /**
+     * Set the value of value.
+     *
+     * @param value new value of value
+     */
+    public void setValue(String value) {
+<span class="nc" id="L140">        this.value = value;</span>
+<span class="nc" id="L141">    }</span>
+
+    /**
+     * Get the value of confidence.
+     *
+     * @return the value of confidence
+     */
+    public Confidence getConfidence() {
+<span class="fc" id="L149">        return confidence;</span>
+    }
+
+    /**
+     * Set the value of confidence.
+     *
+     * @param confidence new value of confidence
+     */
+    public void setConfidence(Confidence confidence) {
+<span class="nc" id="L158">        this.confidence = confidence;</span>
+<span class="nc" id="L159">    }</span>
+
+    /**
+     * Implements the hashCode for Evidence.
+     *
+     * @return hash code.
+     */
+    @Override
+    public int hashCode() {
+<span class="fc" id="L168">        return new HashCodeBuilder(MAGIC_HASH_INIT_VALUE, MAGIC_HASH_MULTIPLIER)</span>
+<span class="fc" id="L169">                .append(StringUtils.lowerCase(name))</span>
+<span class="fc" id="L170">                .append(StringUtils.lowerCase(source))</span>
+<span class="fc" id="L171">                .append(StringUtils.lowerCase(value))</span>
+<span class="fc" id="L172">                .append(confidence)</span>
+<span class="fc" id="L173">                .toHashCode();</span>
+    }
+
+    /**
+     * Implements equals for Evidence.
+     *
+     * @param that an object to check the equality of.
+     * @return whether the two objects are equal.
+     */
+    @SuppressWarnings(&quot;deprecation&quot;)
+    @Override
+    public boolean equals(Object that) {
+<span class="pc bpc" id="L185" title="1 of 2 branches missed.">        if (this == that) {</span>
+<span class="nc" id="L186">            return true;</span>
+        }
+<span class="pc bpc" id="L188" title="1 of 2 branches missed.">        if (!(that instanceof Evidence)) {</span>
+<span class="nc" id="L189">            return false;</span>
+        }
+<span class="fc" id="L191">        final Evidence e = (Evidence) that;</span>
+
+        //TODO the call to ObjectUtils.equals needs to be replaced when we
+        //stop supporting Jenkins 1.6 requirement.
+<span class="pc bpc" id="L195" title="1 of 2 branches missed.">        return StringUtils.equalsIgnoreCase(name, e.name)</span>
+<span class="pc bpc" id="L196" title="1 of 2 branches missed.">                &amp;&amp; StringUtils.equalsIgnoreCase(source, e.source)</span>
+<span class="pc bpc" id="L197" title="1 of 2 branches missed.">                &amp;&amp; StringUtils.equalsIgnoreCase(value, e.value)</span>
+<span class="pc bpc" id="L198" title="1 of 2 branches missed.">                &amp;&amp; ObjectUtils.equals(confidence, e.confidence);</span>
+    }
+
+    /**
+     * Implementation of the comparable interface.
+     *
+     * @param o the evidence being compared
+     * @return an integer indicating the ordering of the two objects
+     */
+    @SuppressWarnings(&quot;deprecation&quot;)
+    @Override
+    public int compareTo(Evidence o) {
+<span class="nc bnc" id="L210" title="All 2 branches missed.">        if (o == null) {</span>
+<span class="nc" id="L211">            throw new IllegalArgumentException(&quot;Unable to compare null evidence&quot;);</span>
+        }
+<span class="nc bnc" id="L213" title="All 2 branches missed.">        if (StringUtils.equalsIgnoreCase(source, o.source)) {</span>
+<span class="nc bnc" id="L214" title="All 2 branches missed.">            if (StringUtils.equalsIgnoreCase(name, o.name)) {</span>
+<span class="nc bnc" id="L215" title="All 2 branches missed.">                if (StringUtils.equalsIgnoreCase(value, o.value)) {</span>
+                    //TODO the call to ObjectUtils.equals needs to be replaced when we
+                    //stop supporting Jenkins 1.6 requirement.
+<span class="nc bnc" id="L218" title="All 2 branches missed.">                    if (ObjectUtils.equals(confidence, o.confidence)) {</span>
+<span class="nc" id="L219">                        return 0; //they are equal</span>
+                    } else {
+<span class="nc" id="L221">                        return ObjectUtils.compare(confidence, o.confidence);</span>
+                    }
+                } else {
+<span class="nc" id="L224">                    return compareToIgnoreCaseWithNullCheck(value, o.value);</span>
+                }
+            } else {
+<span class="nc" id="L227">                return compareToIgnoreCaseWithNullCheck(name, o.name);</span>
+            }
+        } else {
+<span class="nc" id="L230">            return compareToIgnoreCaseWithNullCheck(source, o.source);</span>
+        }
+    }
+
+    /**
+     * Wrapper around
+     * {@link java.lang.String#compareToIgnoreCase(java.lang.String) String.compareToIgnoreCase}
+     * with an exhaustive, possibly duplicative, check against nulls.
+     *
+     * @param me the value to be compared
+     * @param other the other value to be compared
+     * @return true if the values are equal; otherwise false
+     */
+    private int compareToIgnoreCaseWithNullCheck(String me, String other) {
+<span class="nc bnc" id="L244" title="All 4 branches missed.">        if (me == null &amp;&amp; other == null) {</span>
+<span class="nc" id="L245">            return 0;</span>
+<span class="nc bnc" id="L246" title="All 2 branches missed.">        } else if (me == null) {</span>
+<span class="nc" id="L247">            return -1; //the other string is greater than me</span>
+<span class="nc bnc" id="L248" title="All 2 branches missed.">        } else if (other == null) {</span>
+<span class="nc" id="L249">            return 1; //me is greater than the other string</span>
+        }
+<span class="nc" id="L251">        return me.compareToIgnoreCase(other);</span>
+    }
+
+    /**
+     * Standard toString() implementation.
+     *
+     * @return the string representation of the object
+     */
+    @Override
+    public String toString() {
+<span class="fc" id="L261">        return &quot;Evidence{&quot; + &quot;name=&quot; + name + &quot;, source=&quot; + source + &quot;, value=&quot; + value + &quot;, confidence=&quot; + confidence + '}';</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.2.201808211720</span></div></body></html>

@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../jacoco-resources/report.gif" type="image/gif"/><title>DownloadTask.java</title><link rel="stylesheet" href="../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../index.html" class="el_report">Dependency-Check Build-Reporting</a> &gt; <a href="../index.html" class="el_bundle">dependency-check-core</a> &gt; <a href="index.source.html" class="el_package">org.owasp.dependencycheck.data.update.nvd</a> &gt; <span class="el_source">DownloadTask.java</span></div><h1>DownloadTask.java</h1><pre class="source lang-java linenums">/*
+ * This file is part of dependency-check-core.
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ * Copyright (c) 2013 Jeremy Long. All Rights Reserved.
+ */
+package org.owasp.dependencycheck.data.update.nvd;
+
+import java.io.File;
+import java.io.IOException;
+import java.net.URL;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
+import javax.annotation.concurrent.ThreadSafe;
+import org.owasp.dependencycheck.data.nvdcve.CveDB;
+import org.owasp.dependencycheck.data.update.exception.UpdateException;
+import org.owasp.dependencycheck.utils.DownloadFailedException;
+import org.owasp.dependencycheck.utils.Downloader;
+import org.owasp.dependencycheck.utils.Settings;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+/**
+ * A callable object to download two files.
+ *
+ * @author Jeremy Long
+ */
+@ThreadSafe
+public class DownloadTask implements Callable&lt;Future&lt;ProcessTask&gt;&gt; {
+
+    /**
+     * The Logger.
+     */
+<span class="fc" id="L46">    private static final Logger LOGGER = LoggerFactory.getLogger(DownloadTask.class);</span>
+    /**
+     * The CVE DB to use when processing the files.
+     */
+    private final CveDB cveDB;
+    /**
+     * The processor service to pass the results of the download to.
+     */
+    private final ExecutorService processorService;
+    /**
+     * The NVD CVE Meta Data.
+     */
+    private NvdCveInfo nvdCveInfo;
+    /**
+     * A reference to the global settings object.
+     */
+    private final Settings settings;
+    /**
+     * a file.
+     */
+    private File file;
+
+    /**
+     * Simple constructor for the callable download task.
+     *
+     * @param nvdCveInfo the NVD CVE info
+     * @param processor the processor service to submit the downloaded files to
+     * @param cveDB the CVE DB to use to store the vulnerability data
+     * @param settings a reference to the global settings object; this is
+     * necessary so that when the thread is started the dependencies have a
+     * correct reference to the global settings.
+     * @throws UpdateException thrown if temporary files could not be created
+     */
+<span class="fc" id="L79">    public DownloadTask(NvdCveInfo nvdCveInfo, ExecutorService processor, CveDB cveDB, Settings settings) throws UpdateException {</span>
+<span class="fc" id="L80">        this.nvdCveInfo = nvdCveInfo;</span>
+<span class="fc" id="L81">        this.processorService = processor;</span>
+<span class="fc" id="L82">        this.cveDB = cveDB;</span>
+<span class="fc" id="L83">        this.settings = settings;</span>
+
+        try {
+<span class="fc" id="L86">            this.file = File.createTempFile(&quot;cve&quot; + nvdCveInfo.getId() + '_', &quot;.json.gz&quot;, settings.getTempDirectory());</span>
+<span class="nc" id="L87">        } catch (IOException ex) {</span>
+<span class="nc" id="L88">            throw new UpdateException(&quot;Unable to create temporary files&quot;, ex);</span>
+<span class="fc" id="L89">        }</span>
+<span class="fc" id="L90">    }</span>
+
+    /**
+     * Get the value of nvdCveInfo.
+     *
+     * @return the value of nvdCveInfo
+     */
+    public NvdCveInfo getNvdCveInfo() {
+<span class="fc" id="L98">        return nvdCveInfo;</span>
+    }
+
+    /**
+     * Set the value of nvdCveInfo.
+     *
+     * @param nvdCveInfo new value of nvdCveInfo
+     */
+    public void setNvdCveInfo(NvdCveInfo nvdCveInfo) {
+<span class="nc" id="L107">        this.nvdCveInfo = nvdCveInfo;</span>
+<span class="nc" id="L108">    }</span>
+
+    /**
+     * Get the value of file.
+     *
+     * @return the value of file
+     */
+    public File getFile() {
+<span class="fc" id="L116">        return file;</span>
+    }
+
+    @Override
+    public Future&lt;ProcessTask&gt; call() throws Exception {
+        try {
+<span class="fc" id="L122">            final URL url1 = new URL(nvdCveInfo.getUrl());</span>
+<span class="fc" id="L123">            LOGGER.info(&quot;Download Started for NVD CVE - {}&quot;, nvdCveInfo.getId());</span>
+<span class="fc" id="L124">            final long startDownload = System.currentTimeMillis();</span>
+            try {
+<span class="fc" id="L126">                final Downloader downloader = new Downloader(settings);</span>
+<span class="fc" id="L127">                downloader.fetchFile(url1, file);</span>
+<span class="nc" id="L128">            } catch (DownloadFailedException ex) {</span>
+<span class="nc" id="L129">                LOGGER.warn(&quot;Download Failed for NVD CVE - {}\nSome CVEs may not be reported.&quot;, nvdCveInfo.getId());</span>
+<span class="nc bnc" id="L130" title="All 2 branches missed.">                if (settings.getString(Settings.KEYS.PROXY_SERVER) == null) {</span>
+<span class="nc" id="L131">                    LOGGER.info(&quot;If you are behind a proxy you may need to configure dependency-check to use the proxy.&quot;);</span>
+                }
+<span class="nc" id="L133">                LOGGER.debug(&quot;&quot;, ex);</span>
+<span class="nc" id="L134">                return null;</span>
+<span class="fc" id="L135">            }</span>
+
+<span class="fc" id="L137">            LOGGER.info(&quot;Download Complete for NVD CVE - {}  ({} ms)&quot;, nvdCveInfo.getId(),</span>
+<span class="fc" id="L138">                    System.currentTimeMillis() - startDownload);</span>
+<span class="pc bpc" id="L139" title="1 of 2 branches missed.">            if (this.processorService == null) {</span>
+<span class="nc" id="L140">                return null;</span>
+            }
+<span class="fc" id="L142">            final ProcessTask task = new ProcessTask(cveDB, this, settings);</span>
+<span class="fc" id="L143">            return this.processorService.submit(task);</span>
+
+<span class="nc" id="L145">        } catch (Throwable ex) {</span>
+<span class="nc" id="L146">            LOGGER.warn(&quot;An exception occurred downloading NVD CVE - {}\nSome CVEs may not be reported.&quot;, nvdCveInfo.getId());</span>
+<span class="nc" id="L147">            LOGGER.debug(&quot;Download Task Failed&quot;, ex);</span>
+        } finally {
+<span class="fc" id="L149">            settings.cleanup(false);</span>
+        }
+<span class="nc" id="L151">        return null;</span>
+    }
+
+    /**
+     * Attempts to delete the files that were downloaded.
+     */
+    public void cleanup() {
+<span class="pc bpc" id="L158" title="3 of 6 branches missed.">        if (file != null &amp;&amp; file.exists() &amp;&amp; !file.delete()) {</span>
+<span class="nc" id="L159">            LOGGER.debug(&quot;Failed to delete first temporary file {}&quot;, file.toString());</span>
+<span class="nc" id="L160">            file.deleteOnExit();</span>
+        }
+<span class="fc" id="L162">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.2.201808211720</span></div></body></html>

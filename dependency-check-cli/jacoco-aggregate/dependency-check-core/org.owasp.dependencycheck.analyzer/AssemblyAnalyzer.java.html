@@ -1,0 +1,373 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../jacoco-resources/report.gif" type="image/gif"/><title>AssemblyAnalyzer.java</title><link rel="stylesheet" href="../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../index.html" class="el_report">Dependency-Check Command Line</a> &gt; <a href="../index.html" class="el_bundle">dependency-check-core</a> &gt; <a href="index.source.html" class="el_package">org.owasp.dependencycheck.analyzer</a> &gt; <span class="el_source">AssemblyAnalyzer.java</span></div><h1>AssemblyAnalyzer.java</h1><pre class="source lang-java linenums">/*
+ * This file is part of dependency-check-core.
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ * Copyright (c) 2012 Jeremy Long. All Rights Reserved.
+ */
+package org.owasp.dependencycheck.analyzer;
+
+import java.io.File;
+import java.io.FileFilter;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.output.NullOutputStream;
+import org.owasp.dependencycheck.Engine;
+import org.owasp.dependencycheck.analyzer.exception.AnalysisException;
+import org.owasp.dependencycheck.dependency.Confidence;
+import org.owasp.dependencycheck.dependency.Dependency;
+import org.owasp.dependencycheck.utils.FileFilterBuilder;
+import org.owasp.dependencycheck.utils.FileUtils;
+import org.owasp.dependencycheck.utils.Settings;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.w3c.dom.Document;
+import org.xml.sax.SAXException;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
+import java.util.ArrayList;
+import java.util.List;
+import javax.annotation.concurrent.ThreadSafe;
+import javax.xml.parsers.ParserConfigurationException;
+import org.owasp.dependencycheck.exception.InitializationException;
+import org.apache.commons.lang3.SystemUtils;
+import org.owasp.dependencycheck.dependency.EvidenceType;
+import org.owasp.dependencycheck.utils.XmlUtils;
+
+/**
+ * Analyzer for getting company, product, and version information from a .NET
+ * assembly.
+ *
+ * @author colezlaw
+ *
+ */
+@ThreadSafe
+<span class="fc" id="L61">public class AssemblyAnalyzer extends AbstractFileTypeAnalyzer {</span>
+
+    /**
+     * The analyzer name
+     */
+    private static final String ANALYZER_NAME = &quot;Assembly Analyzer&quot;;
+    /**
+     * The analysis phase
+     */
+<span class="fc" id="L70">    private static final AnalysisPhase ANALYSIS_PHASE = AnalysisPhase.INFORMATION_COLLECTION;</span>
+    /**
+     * The list of supported extensions
+     */
+<span class="fc" id="L74">    private static final String[] SUPPORTED_EXTENSIONS = {&quot;dll&quot;, &quot;exe&quot;};</span>
+    /**
+     * The File Filter used to filter supported extensions.
+     */
+<span class="fc" id="L78">    private static final FileFilter FILTER = FileFilterBuilder.newInstance().addExtensions(</span>
+<span class="fc" id="L79">            SUPPORTED_EXTENSIONS).build();</span>
+    /**
+     * The temp value for `GrokAssembly.exe`.
+     */
+<span class="fc" id="L83">    private File grokAssemblyExe = null;</span>
+    /**
+     * The temp value for `GrokAssembly.exe.config`.
+     */
+<span class="fc" id="L87">    private File grokAssemblyConfig = null;</span>
+    /**
+     * Logger
+     */
+<span class="fc" id="L91">    private static final Logger LOGGER = LoggerFactory.getLogger(AssemblyAnalyzer.class);</span>
+
+    /**
+     * Builds the beginnings of a List for ProcessBuilder
+     *
+     * @return the list of arguments to begin populating the ProcessBuilder
+     */
+    protected List&lt;String&gt; buildArgumentList() {
+        // Use file.separator as a wild guess as to whether this is Windows
+<span class="fc" id="L100">        final List&lt;String&gt; args = new ArrayList&lt;&gt;();</span>
+<span class="pc bpc" id="L101" title="1 of 2 branches missed.">        if (!SystemUtils.IS_OS_WINDOWS) {</span>
+<span class="pc bpc" id="L102" title="1 of 2 branches missed.">            if (getSettings().getString(Settings.KEYS.ANALYZER_ASSEMBLY_MONO_PATH) != null) {</span>
+<span class="nc" id="L103">                args.add(getSettings().getString(Settings.KEYS.ANALYZER_ASSEMBLY_MONO_PATH));</span>
+<span class="pc bpc" id="L104" title="1 of 2 branches missed.">            } else if (isInPath(&quot;mono&quot;)) {</span>
+<span class="nc" id="L105">                args.add(&quot;mono&quot;);</span>
+            } else {
+<span class="fc" id="L107">                return null;</span>
+            }
+        }
+<span class="nc" id="L110">        args.add(grokAssemblyExe.getPath());</span>
+<span class="nc" id="L111">        return args;</span>
+    }
+
+    /**
+     * Performs the analysis on a single Dependency.
+     *
+     * @param dependency the dependency to analyze
+     * @param engine the engine to perform the analysis under
+     * @throws AnalysisException if anything goes sideways
+     */
+    @Override
+    public void analyzeDependency(Dependency dependency, Engine engine) throws AnalysisException {
+<span class="nc" id="L123">        final File test = new File(dependency.getActualFilePath());</span>
+<span class="nc bnc" id="L124" title="All 2 branches missed.">        if (!test.isFile()) {</span>
+<span class="nc" id="L125">            throw new AnalysisException(String.format(&quot;%s does not exist and cannot be analyzed by dependency-check&quot;,</span>
+<span class="nc" id="L126">                    dependency.getActualFilePath()));</span>
+        }
+<span class="nc bnc" id="L128" title="All 2 branches missed.">        if (grokAssemblyExe == null) {</span>
+<span class="nc" id="L129">            LOGGER.warn(&quot;GrokAssembly didn't get deployed&quot;);</span>
+<span class="nc" id="L130">            return;</span>
+        }
+<span class="nc" id="L132">        final List&lt;String&gt; args = buildArgumentList();</span>
+<span class="nc bnc" id="L133" title="All 2 branches missed.">        if (args == null) {</span>
+<span class="nc" id="L134">            LOGGER.warn(&quot;Assembly Analyzer was unable to execute&quot;);</span>
+<span class="nc" id="L135">            return;</span>
+        }
+<span class="nc" id="L137">        args.add(dependency.getActualFilePath());</span>
+<span class="nc" id="L138">        final ProcessBuilder pb = new ProcessBuilder(args);</span>
+        final Document doc;
+        try {
+<span class="nc" id="L141">            final Process proc = pb.start();</span>
+<span class="nc" id="L142">            final DocumentBuilder builder = XmlUtils.buildSecureDocumentBuilder();</span>
+
+<span class="nc" id="L144">            doc = builder.parse(proc.getInputStream());</span>
+
+            // Try evacuating the error stream
+<span class="nc" id="L147">            final String errorStream = IOUtils.toString(proc.getErrorStream(), StandardCharsets.UTF_8);</span>
+<span class="nc bnc" id="L148" title="All 4 branches missed.">            if (null != errorStream &amp;&amp; !errorStream.isEmpty()) {</span>
+<span class="nc" id="L149">                LOGGER.warn(&quot;Error from GrokAssembly: {}&quot;, errorStream);</span>
+            }
+
+            final int rc;
+            try {
+<span class="nc" id="L154">                rc = proc.waitFor();</span>
+<span class="nc" id="L155">            } catch (InterruptedException ie) {</span>
+<span class="nc" id="L156">                Thread.currentThread().interrupt();</span>
+<span class="nc" id="L157">                return;</span>
+<span class="nc" id="L158">            }</span>
+<span class="nc bnc" id="L159" title="All 2 branches missed.">            if (rc == 3) {</span>
+<span class="nc" id="L160">                LOGGER.debug(&quot;{} is not a .NET assembly or executable and as such cannot be analyzed by dependency-check&quot;,</span>
+<span class="nc" id="L161">                        dependency.getActualFilePath());</span>
+<span class="nc" id="L162">                return;</span>
+<span class="nc bnc" id="L163" title="All 2 branches missed.">            } else if (rc != 0) {</span>
+<span class="nc" id="L164">                LOGGER.debug(&quot;Return code {} from GrokAssembly; dependency-check is unable to analyze the library: {}&quot;,</span>
+<span class="nc" id="L165">                        rc, dependency.getActualFilePath());</span>
+<span class="nc" id="L166">                return;</span>
+            }
+
+<span class="nc" id="L169">            final XPath xpath = XPathFactory.newInstance().newXPath();</span>
+
+            // First, see if there was an error
+<span class="nc" id="L172">            final String error = xpath.evaluate(&quot;/assembly/error&quot;, doc);</span>
+<span class="nc bnc" id="L173" title="All 4 branches missed.">            if (error != null &amp;&amp; !error.isEmpty()) {</span>
+<span class="nc" id="L174">                throw new AnalysisException(error);</span>
+            }
+
+<span class="nc" id="L177">            final String version = xpath.evaluate(&quot;/assembly/version&quot;, doc);</span>
+<span class="nc bnc" id="L178" title="All 2 branches missed.">            if (version != null) {</span>
+<span class="nc" id="L179">                dependency.addEvidence(EvidenceType.VERSION, &quot;grokassembly&quot;, &quot;version&quot;, version, Confidence.HIGHEST);</span>
+            }
+
+<span class="nc" id="L182">            final String vendor = xpath.evaluate(&quot;/assembly/company&quot;, doc);</span>
+<span class="nc bnc" id="L183" title="All 2 branches missed.">            if (vendor != null) {</span>
+<span class="nc" id="L184">                dependency.addEvidence(EvidenceType.VENDOR, &quot;grokassembly&quot;, &quot;vendor&quot;, vendor, Confidence.HIGH);</span>
+            }
+
+<span class="nc" id="L187">            final String product = xpath.evaluate(&quot;/assembly/product&quot;, doc);</span>
+<span class="nc bnc" id="L188" title="All 2 branches missed.">            if (product != null) {</span>
+<span class="nc" id="L189">                dependency.addEvidence(EvidenceType.PRODUCT, &quot;grokassembly&quot;, &quot;product&quot;, product, Confidence.HIGH);</span>
+            }
+
+<span class="nc" id="L192">        } catch (ParserConfigurationException pce) {</span>
+<span class="nc" id="L193">            throw new AnalysisException(&quot;Error initializing the assembly analyzer&quot;, pce);</span>
+<span class="nc" id="L194">        } catch (IOException | XPathExpressionException ioe) {</span>
+<span class="nc" id="L195">            throw new AnalysisException(ioe);</span>
+<span class="nc" id="L196">        } catch (SAXException saxe) {</span>
+<span class="nc" id="L197">            LOGGER.error(&quot;----------------------------------------------------&quot;);</span>
+<span class="nc" id="L198">            LOGGER.error(&quot;Failed to read the Assembly Analyzer results. &quot;</span>
+                    + &quot;On some systems mono-runtime and mono-devel need to be installed.&quot;);
+<span class="nc" id="L200">            LOGGER.error(&quot;----------------------------------------------------&quot;);</span>
+<span class="nc" id="L201">            throw new AnalysisException(&quot;Couldn't parse Assembly Analyzer results (GrokAssembly)&quot;, saxe);</span>
+<span class="nc" id="L202">        }</span>
+<span class="nc" id="L203">    }</span>
+
+    /**
+     * Initialize the analyzer. In this case, extract GrokAssembly.exe to a
+     * temporary location.
+     *
+     * @param engine a reference to the dependency-check engine
+     * @throws InitializationException thrown if anything goes wrong
+     */
+    @Override
+    public void prepareFileTypeAnalyzer(Engine engine) throws InitializationException {
+        final File tempFile;
+        final File cfgFile;
+        try {
+<span class="fc" id="L217">            tempFile = File.createTempFile(&quot;GKA&quot;, &quot;.exe&quot;, getSettings().getTempDirectory());</span>
+<span class="fc" id="L218">            cfgFile = new File(tempFile.getPath() + &quot;.config&quot;);</span>
+<span class="nc" id="L219">        } catch (IOException ex) {</span>
+<span class="nc" id="L220">            setEnabled(false);</span>
+<span class="nc" id="L221">            throw new InitializationException(&quot;Unable to create temporary file for the assembly analyzer&quot;, ex);</span>
+<span class="fc" id="L222">        }</span>
+<span class="fc" id="L223">        try (FileOutputStream fos = new FileOutputStream(tempFile);</span>
+<span class="fc" id="L224">                InputStream is = FileUtils.getResourceAsStream(&quot;GrokAssembly.exe&quot;);</span>
+<span class="fc" id="L225">                FileOutputStream fosCfg = new FileOutputStream(cfgFile);</span>
+<span class="fc" id="L226">                InputStream isCfg = FileUtils.getResourceAsStream(&quot;GrokAssembly.exe.config&quot;)) {</span>
+<span class="fc" id="L227">            IOUtils.copy(is, fos);</span>
+<span class="fc" id="L228">            grokAssemblyExe = tempFile;</span>
+<span class="fc" id="L229">            LOGGER.debug(&quot;Extracted GrokAssembly.exe to {}&quot;, grokAssemblyExe.getPath());</span>
+<span class="fc" id="L230">            IOUtils.copy(isCfg, fosCfg);</span>
+<span class="fc" id="L231">            grokAssemblyConfig = cfgFile;</span>
+<span class="fc" id="L232">            LOGGER.debug(&quot;Extracted GrokAssembly.exe.config to {}&quot;, cfgFile);</span>
+<span class="nc" id="L233">        } catch (IOException ioe) {</span>
+<span class="nc" id="L234">            this.setEnabled(false);</span>
+<span class="nc" id="L235">            LOGGER.warn(&quot;Could not extract GrokAssembly.exe: {}&quot;, ioe.getMessage());</span>
+<span class="nc" id="L236">            throw new InitializationException(&quot;Could not extract GrokAssembly.exe&quot;, ioe);</span>
+<span class="fc" id="L237">        }</span>
+
+        // Now, need to see if GrokAssembly actually runs from this location.
+<span class="fc" id="L240">        final List&lt;String&gt; args = buildArgumentList();</span>
+        //TODO this creates an &quot;unreported&quot; error - if someone doesn't look
+        // at the command output this could easily be missed (especially in an
+        // Ant or Maven build.
+        //
+        // We need to create a non-fatal warning error type that will
+        // get added to the report.
+        //TODO this idea needs to get replicated to the bundle audit analyzer.
+<span class="pc bpc" id="L248" title="1 of 2 branches missed.">        if (args == null) {</span>
+<span class="fc" id="L249">            setEnabled(false);</span>
+<span class="fc" id="L250">            LOGGER.error(&quot;----------------------------------------------------&quot;);</span>
+<span class="fc" id="L251">            LOGGER.error(&quot;.NET Assembly Analyzer could not be initialized and at least one &quot;</span>
+                    + &quot;'exe' or 'dll' was scanned. The 'mono' executable could not be found on &quot;
+                    + &quot;the path; either disable the Assembly Analyzer or configure the path mono. &quot;
+                    + &quot;On some systems mono-runtime and mono-devel need to be installed.&quot;);
+<span class="fc" id="L255">            LOGGER.error(&quot;----------------------------------------------------&quot;);</span>
+<span class="fc" id="L256">            return;</span>
+        }
+        try {
+<span class="nc" id="L259">            final ProcessBuilder pb = new ProcessBuilder(args);</span>
+<span class="nc" id="L260">            final Process p = pb.start();</span>
+            // Try evacuating the error stream
+<span class="nc" id="L262">            IOUtils.copy(p.getErrorStream(), NullOutputStream.NULL_OUTPUT_STREAM);</span>
+
+<span class="nc" id="L264">            final DocumentBuilder builder = XmlUtils.buildSecureDocumentBuilder();</span>
+<span class="nc" id="L265">            final Document doc = builder.parse(p.getInputStream());</span>
+<span class="nc" id="L266">            final XPath xpath = XPathFactory.newInstance().newXPath();</span>
+<span class="nc" id="L267">            final String error = xpath.evaluate(&quot;/assembly/error&quot;, doc);</span>
+<span class="nc bnc" id="L268" title="All 6 branches missed.">            if (p.waitFor() != 1 || error == null || error.isEmpty()) {</span>
+<span class="nc" id="L269">                LOGGER.warn(&quot;An error occurred with the .NET AssemblyAnalyzer, please see the log for more details.&quot;);</span>
+<span class="nc" id="L270">                LOGGER.debug(&quot;GrokAssembly.exe is not working properly&quot;);</span>
+<span class="nc" id="L271">                grokAssemblyExe = null;</span>
+<span class="nc" id="L272">                setEnabled(false);</span>
+<span class="nc" id="L273">                throw new InitializationException(&quot;Could not execute .NET AssemblyAnalyzer&quot;);</span>
+            }
+<span class="nc" id="L275">        } catch (InitializationException e) {</span>
+<span class="nc" id="L276">            setEnabled(false);</span>
+<span class="nc" id="L277">            throw e;</span>
+<span class="nc" id="L278">        } catch (IOException | ParserConfigurationException | SAXException | XPathExpressionException | InterruptedException e) {</span>
+<span class="nc" id="L279">            LOGGER.warn(&quot;An error occurred with the .NET AssemblyAnalyzer;\n&quot;</span>
+                    + &quot;this can be ignored unless you are scanning .NET DLLs. Please see the log for more details.&quot;);
+<span class="nc" id="L281">            LOGGER.debug(&quot;Could not execute GrokAssembly {}&quot;, e.getMessage());</span>
+<span class="nc" id="L282">            setEnabled(false);</span>
+<span class="nc" id="L283">            throw new InitializationException(&quot;An error occurred with the .NET AssemblyAnalyzer&quot;, e);</span>
+<span class="nc" id="L284">        }</span>
+<span class="nc" id="L285">    }</span>
+
+    /**
+     * Removes resources used from the local file system.
+     *
+     * @throws Exception thrown if there is a problem closing the analyzer
+     */
+    @Override
+    public void closeAnalyzer() throws Exception {
+        try {
+<span class="nc bnc" id="L295" title="All 4 branches missed.">            if (grokAssemblyExe != null &amp;&amp; !grokAssemblyExe.delete()) {</span>
+<span class="nc" id="L296">                LOGGER.debug(&quot;Unable to delete temporary GrokAssembly.exe; attempting delete on exit&quot;);</span>
+<span class="nc" id="L297">                grokAssemblyExe.deleteOnExit();</span>
+            }
+<span class="nc" id="L299">        } catch (SecurityException se) {</span>
+<span class="nc" id="L300">            LOGGER.debug(&quot;Can't delete temporary GrokAssembly.exe&quot;);</span>
+<span class="nc" id="L301">            grokAssemblyExe.deleteOnExit();</span>
+<span class="nc" id="L302">        }</span>
+        try {
+<span class="nc bnc" id="L304" title="All 4 branches missed.">            if (grokAssemblyConfig != null &amp;&amp; !grokAssemblyConfig.delete()) {</span>
+<span class="nc" id="L305">                LOGGER.debug(&quot;Unable to delete temporary GrokAssembly.exe.config; attempting delete on exit&quot;);</span>
+<span class="nc" id="L306">                grokAssemblyConfig.deleteOnExit();</span>
+            }
+<span class="nc" id="L308">        } catch (SecurityException se) {</span>
+<span class="nc" id="L309">            LOGGER.debug(&quot;Can't delete temporary GrokAssembly.exe.config&quot;);</span>
+<span class="nc" id="L310">            grokAssemblyConfig.deleteOnExit();</span>
+<span class="nc" id="L311">        }</span>
+<span class="nc" id="L312">    }</span>
+
+    @Override
+    protected FileFilter getFileFilter() {
+<span class="fc" id="L316">        return FILTER;</span>
+    }
+
+    /**
+     * Gets this analyzer's name.
+     *
+     * @return the analyzer name
+     */
+    @Override
+    public String getName() {
+<span class="fc" id="L326">        return ANALYZER_NAME;</span>
+    }
+
+    /**
+     * Returns the phase this analyzer runs under.
+     *
+     * @return the phase this runs under
+     */
+    @Override
+    public AnalysisPhase getAnalysisPhase() {
+<span class="fc" id="L336">        return ANALYSIS_PHASE;</span>
+    }
+
+    /**
+     * Returns the key used in the properties file to reference the analyzer's
+     * enabled property.
+     *
+     * @return the analyzer's enabled property setting key
+     */
+    @Override
+    protected String getAnalyzerEnabledSettingKey() {
+<span class="fc" id="L347">        return Settings.KEYS.ANALYZER_ASSEMBLY_ENABLED;</span>
+    }
+
+    /**
+     * Tests to see if a file is in the system path. &lt;b&gt;Note&lt;/b&gt; - the current
+     * implementation only works on non-windows platforms. For purposes of the
+     * AssemblyAnalyzer this is okay as this is only needed on Mac/*nix.
+     *
+     * @param file the executable to look for
+     * @return &lt;code&gt;true&lt;/code&gt; if the file exists; otherwise
+     * &lt;code&gt;false&lt;/code&gt;
+     */
+    private boolean isInPath(String file) {
+<span class="fc" id="L360">        final ProcessBuilder pb = new ProcessBuilder(&quot;which&quot;, file);</span>
+        try {
+<span class="fc" id="L362">            final Process proc = pb.start();</span>
+<span class="fc" id="L363">            final int retCode = proc.waitFor();</span>
+<span class="pc bpc" id="L364" title="1 of 2 branches missed.">            if (retCode == 0) {</span>
+<span class="nc" id="L365">                return true;</span>
+            }
+<span class="nc" id="L367">        } catch (IOException | InterruptedException ex) {</span>
+<span class="nc" id="L368">            LOGGER.debug(&quot;Path search failed for &quot; + file, ex);</span>
+<span class="fc" id="L369">        }</span>
+<span class="fc" id="L370">        return false;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.2.201808211720</span></div></body></html>

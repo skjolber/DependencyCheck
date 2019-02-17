@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../jacoco-resources/report.gif" type="image/gif"/><title>BaseMetricV2.java</title><link rel="stylesheet" href="../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../index.html" class="el_report">Dependency-Check Command Line</a> &gt; <a href="../index.html" class="el_bundle">dependency-check-core</a> &gt; <a href="index.source.html" class="el_package">org.owasp.dependencycheck.data.nvd.json</a> &gt; <span class="el_source">BaseMetricV2.java</span></div><h1>BaseMetricV2.java</h1><pre class="source lang-java linenums">
+package org.owasp.dependencycheck.data.nvd.json;
+
+import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+
+
+/**
+ * CVSS V2.0 score.
+ * 
+ */
+<span class="fc" id="L15">public class BaseMetricV2 {</span>
+
+    /**
+     * JSON Schema for Common Vulnerability Scoring System version 2.0
+     * &lt;p&gt;
+     * 
+     * 
+     */
+    @SerializedName(&quot;cvssV2&quot;)
+    @Expose
+    private CvssV20 cvssV2;
+    @SerializedName(&quot;severity&quot;)
+    @Expose
+    private String severity;
+    /**
+     * CVSS subscore.
+     * 
+     */
+    @SerializedName(&quot;exploitabilityScore&quot;)
+    @Expose
+    private Double exploitabilityScore;
+    /**
+     * CVSS subscore.
+     * 
+     */
+    @SerializedName(&quot;impactScore&quot;)
+    @Expose
+    private Double impactScore;
+    @SerializedName(&quot;acInsufInfo&quot;)
+    @Expose
+    private Boolean acInsufInfo;
+    @SerializedName(&quot;obtainAllPrivilege&quot;)
+    @Expose
+    private Boolean obtainAllPrivilege;
+    @SerializedName(&quot;obtainUserPrivilege&quot;)
+    @Expose
+    private Boolean obtainUserPrivilege;
+    @SerializedName(&quot;obtainOtherPrivilege&quot;)
+    @Expose
+    private Boolean obtainOtherPrivilege;
+    @SerializedName(&quot;userInteractionRequired&quot;)
+    @Expose
+    private Boolean userInteractionRequired;
+
+    /**
+     * JSON Schema for Common Vulnerability Scoring System version 2.0
+     * &lt;p&gt;
+     * 
+     * 
+     */
+    public CvssV20 getCvssV2() {
+<span class="fc" id="L66">        return cvssV2;</span>
+    }
+
+    /**
+     * JSON Schema for Common Vulnerability Scoring System version 2.0
+     * &lt;p&gt;
+     * 
+     * 
+     */
+    public void setCvssV2(CvssV20 cvssV2) {
+<span class="nc" id="L76">        this.cvssV2 = cvssV2;</span>
+<span class="nc" id="L77">    }</span>
+
+    public String getSeverity() {
+<span class="fc" id="L80">        return severity;</span>
+    }
+
+    public void setSeverity(String severity) {
+<span class="nc" id="L84">        this.severity = severity;</span>
+<span class="nc" id="L85">    }</span>
+
+    /**
+     * CVSS subscore.
+     * 
+     */
+    public Double getExploitabilityScore() {
+<span class="nc" id="L92">        return exploitabilityScore;</span>
+    }
+
+    /**
+     * CVSS subscore.
+     * 
+     */
+    public void setExploitabilityScore(Double exploitabilityScore) {
+<span class="nc" id="L100">        this.exploitabilityScore = exploitabilityScore;</span>
+<span class="nc" id="L101">    }</span>
+
+    /**
+     * CVSS subscore.
+     * 
+     */
+    public Double getImpactScore() {
+<span class="nc" id="L108">        return impactScore;</span>
+    }
+
+    /**
+     * CVSS subscore.
+     * 
+     */
+    public void setImpactScore(Double impactScore) {
+<span class="nc" id="L116">        this.impactScore = impactScore;</span>
+<span class="nc" id="L117">    }</span>
+
+    public Boolean getAcInsufInfo() {
+<span class="nc" id="L120">        return acInsufInfo;</span>
+    }
+
+    public void setAcInsufInfo(Boolean acInsufInfo) {
+<span class="nc" id="L124">        this.acInsufInfo = acInsufInfo;</span>
+<span class="nc" id="L125">    }</span>
+
+    public Boolean getObtainAllPrivilege() {
+<span class="nc" id="L128">        return obtainAllPrivilege;</span>
+    }
+
+    public void setObtainAllPrivilege(Boolean obtainAllPrivilege) {
+<span class="nc" id="L132">        this.obtainAllPrivilege = obtainAllPrivilege;</span>
+<span class="nc" id="L133">    }</span>
+
+    public Boolean getObtainUserPrivilege() {
+<span class="nc" id="L136">        return obtainUserPrivilege;</span>
+    }
+
+    public void setObtainUserPrivilege(Boolean obtainUserPrivilege) {
+<span class="nc" id="L140">        this.obtainUserPrivilege = obtainUserPrivilege;</span>
+<span class="nc" id="L141">    }</span>
+
+    public Boolean getObtainOtherPrivilege() {
+<span class="nc" id="L144">        return obtainOtherPrivilege;</span>
+    }
+
+    public void setObtainOtherPrivilege(Boolean obtainOtherPrivilege) {
+<span class="nc" id="L148">        this.obtainOtherPrivilege = obtainOtherPrivilege;</span>
+<span class="nc" id="L149">    }</span>
+
+    public Boolean getUserInteractionRequired() {
+<span class="nc" id="L152">        return userInteractionRequired;</span>
+    }
+
+    public void setUserInteractionRequired(Boolean userInteractionRequired) {
+<span class="nc" id="L156">        this.userInteractionRequired = userInteractionRequired;</span>
+<span class="nc" id="L157">    }</span>
+
+    @Override
+    public String toString() {
+<span class="nc" id="L161">        return new ToStringBuilder(this).append(&quot;cvssV2&quot;, cvssV2).append(&quot;severity&quot;, severity).append(&quot;exploitabilityScore&quot;, exploitabilityScore).append(&quot;impactScore&quot;, impactScore).append(&quot;acInsufInfo&quot;, acInsufInfo).append(&quot;obtainAllPrivilege&quot;, obtainAllPrivilege).append(&quot;obtainUserPrivilege&quot;, obtainUserPrivilege).append(&quot;obtainOtherPrivilege&quot;, obtainOtherPrivilege).append(&quot;userInteractionRequired&quot;, userInteractionRequired).toString();</span>
+    }
+
+    @Override
+    public int hashCode() {
+<span class="nc" id="L166">        return new HashCodeBuilder().append(severity).append(exploitabilityScore).append(obtainAllPrivilege).append(userInteractionRequired).append(obtainOtherPrivilege).append(cvssV2).append(impactScore).append(acInsufInfo).append(obtainUserPrivilege).toHashCode();</span>
+    }
+
+    @Override
+    public boolean equals(Object other) {
+<span class="nc bnc" id="L171" title="All 2 branches missed.">        if (other == this) {</span>
+<span class="nc" id="L172">            return true;</span>
+        }
+<span class="nc bnc" id="L174" title="All 2 branches missed.">        if ((other instanceof BaseMetricV2) == false) {</span>
+<span class="nc" id="L175">            return false;</span>
+        }
+<span class="nc" id="L177">        BaseMetricV2 rhs = ((BaseMetricV2) other);</span>
+<span class="nc" id="L178">        return new EqualsBuilder().append(severity, rhs.severity).append(exploitabilityScore, rhs.exploitabilityScore).append(obtainAllPrivilege, rhs.obtainAllPrivilege).append(userInteractionRequired, rhs.userInteractionRequired).append(obtainOtherPrivilege, rhs.obtainOtherPrivilege).append(cvssV2, rhs.cvssV2).append(impactScore, rhs.impactScore).append(acInsufInfo, rhs.acInsufInfo).append(obtainUserPrivilege, rhs.obtainUserPrivilege).isEquals();</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.2.201808211720</span></div></body></html>

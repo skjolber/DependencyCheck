@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../jacoco-resources/report.gif" type="image/gif"/><title>PomParser.java</title><link rel="stylesheet" href="../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../index.html" class="el_report">Dependency-Check Maven Plugin</a> &gt; <a href="../index.html" class="el_bundle">dependency-check-core</a> &gt; <a href="index.source.html" class="el_package">org.owasp.dependencycheck.xml.pom</a> &gt; <span class="el_source">PomParser.java</span></div><h1>PomParser.java</h1><pre class="source lang-java linenums">/*
+ * This file is part of dependency-check-core.
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ * Copyright (c) 2015 Jeremy Long. All Rights Reserved.
+ */
+package org.owasp.dependencycheck.xml.pom;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.nio.charset.StandardCharsets;
+import javax.annotation.concurrent.ThreadSafe;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.parsers.SAXParser;
+import org.apache.commons.io.ByteOrderMark;
+import org.apache.commons.io.input.BOMInputStream;
+import org.owasp.dependencycheck.utils.XmlUtils;
+import org.owasp.dependencycheck.xml.XmlInputStream;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+import org.xml.sax.XMLReader;
+
+/**
+ * A parser for pom.xml files.
+ *
+ * @author Jeremy Long
+ */
+@ThreadSafe
+<span class="fc" id="L48">public class PomParser {</span>
+
+    /**
+     * The logger.
+     */
+<span class="fc" id="L53">    private static final Logger LOGGER = LoggerFactory.getLogger(PomParser.class);</span>
+
+    /**
+     * Parses the given xml file and returns a Model object containing only the
+     * fields dependency-check requires.
+     *
+     * @param file a pom.xml
+     * @return a Model object containing only the fields dependency-check
+     * requires
+     * @throws PomParseException thrown if the xml file cannot be parsed
+     */
+    public Model parse(File file) throws PomParseException {
+<span class="fc" id="L65">        try (FileInputStream fis = new FileInputStream(file)) {</span>
+<span class="fc" id="L66">            return parse(fis);</span>
+<span class="nc" id="L67">        } catch (IOException ex) {</span>
+<span class="nc" id="L68">            LOGGER.debug(&quot;&quot;, ex);</span>
+<span class="nc" id="L69">            throw new PomParseException(String.format(&quot;Unable to parse pom '%s'&quot;, file.toString()), ex);</span>
+        }
+    }
+
+    /**
+     * Parses the given XML file and returns a Model object containing only the
+     * fields dependency-check requires.
+     *
+     * @param inputStream an InputStream containing suppression rues
+     * @return a list of suppression rules
+     * @throws PomParseException if the XML cannot be parsed
+     */
+    public Model parse(InputStream inputStream) throws PomParseException {
+        try {
+<span class="fc" id="L83">            final PomHandler handler = new PomHandler();</span>
+<span class="fc" id="L84">            final SAXParser saxParser = XmlUtils.buildSecureSaxParser();</span>
+<span class="fc" id="L85">            final XMLReader xmlReader = saxParser.getXMLReader();</span>
+<span class="fc" id="L86">            xmlReader.setContentHandler(handler);</span>
+
+<span class="fc" id="L88">            final BOMInputStream bomStream = new BOMInputStream(new XmlInputStream(new PomProjectInputStream(inputStream)));</span>
+<span class="fc" id="L89">            final ByteOrderMark bom = bomStream.getBOM();</span>
+<span class="fc" id="L90">            final String defaultEncoding = StandardCharsets.UTF_8.name();</span>
+<span class="pc bpc" id="L91" title="1 of 2 branches missed.">            final String charsetName = bom == null ? defaultEncoding : bom.getCharsetName();</span>
+<span class="fc" id="L92">            final Reader reader = new InputStreamReader(bomStream, charsetName);</span>
+<span class="fc" id="L93">            final InputSource in = new InputSource(reader);</span>
+<span class="fc" id="L94">            xmlReader.parse(in);</span>
+<span class="fc" id="L95">            return handler.getModel();</span>
+<span class="nc" id="L96">        } catch (ParserConfigurationException | SAXException | FileNotFoundException ex) {</span>
+<span class="nc" id="L97">            LOGGER.debug(&quot;&quot;, ex);</span>
+<span class="nc" id="L98">            throw new PomParseException(ex);</span>
+<span class="nc" id="L99">        } catch (IOException ex) {</span>
+<span class="nc" id="L100">            LOGGER.debug(&quot;&quot;, ex);</span>
+<span class="nc" id="L101">            throw new PomParseException(ex);</span>
+        }
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.2.201808211720</span></div></body></html>

@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../jacoco-resources/report.gif" type="image/gif"/><title>NvdCveFeedJson10.java</title><link rel="stylesheet" href="../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../index.html" class="el_report">Dependency-Check Command Line</a> &gt; <a href="../index.html" class="el_bundle">dependency-check-core</a> &gt; <a href="index.source.html" class="el_package">org.owasp.dependencycheck.data.nvd.json</a> &gt; <span class="el_source">NvdCveFeedJson10.java</span></div><h1>NvdCveFeedJson10.java</h1><pre class="source lang-java linenums">
+package org.owasp.dependencycheck.data.nvd.json;
+
+import java.util.ArrayList;
+import java.util.List;
+import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+
+
+/**
+ * JSON Schema for NVD Vulnerability Data Feed version 1.0
+ * &lt;p&gt;
+ * 
+ * 
+ */
+<span class="nc" id="L19">public class NvdCveFeedJson10 {</span>
+
+    /**
+     * 
+     * (Required)
+     * 
+     */
+    @SerializedName(&quot;CVE_data_type&quot;)
+    @Expose
+    private String cVEDataType;
+    /**
+     * 
+     * (Required)
+     * 
+     */
+    @SerializedName(&quot;CVE_data_format&quot;)
+    @Expose
+    private String cVEDataFormat;
+    /**
+     * 
+     * (Required)
+     * 
+     */
+    @SerializedName(&quot;CVE_data_version&quot;)
+    @Expose
+    private String cVEDataVersion;
+    /**
+     * NVD adds number of CVE in this feed
+     * 
+     */
+    @SerializedName(&quot;CVE_data_numberOfCVEs&quot;)
+    @Expose
+    private String cVEDataNumberOfCVEs;
+    /**
+     * NVD adds feed date timestamp
+     * 
+     */
+    @SerializedName(&quot;CVE_data_timestamp&quot;)
+    @Expose
+    private String cVEDataTimestamp;
+    /**
+     * NVD feed array of CVE
+     * (Required)
+     * 
+     */
+<span class="nc" id="L64">    @SerializedName(&quot;CVE_Items&quot;)</span>
+    @Expose
+    private List&lt;CVEItem&gt; cVEItems = new ArrayList&lt;CVEItem&gt;();
+
+    /**
+     * 
+     * (Required)
+     * 
+     */
+    public String getCVEDataType() {
+<span class="nc" id="L74">        return cVEDataType;</span>
+    }
+
+    /**
+     * 
+     * (Required)
+     * 
+     */
+    public void setCVEDataType(String cVEDataType) {
+<span class="nc" id="L83">        this.cVEDataType = cVEDataType;</span>
+<span class="nc" id="L84">    }</span>
+
+    /**
+     * 
+     * (Required)
+     * 
+     */
+    public String getCVEDataFormat() {
+<span class="nc" id="L92">        return cVEDataFormat;</span>
+    }
+
+    /**
+     * 
+     * (Required)
+     * 
+     */
+    public void setCVEDataFormat(String cVEDataFormat) {
+<span class="nc" id="L101">        this.cVEDataFormat = cVEDataFormat;</span>
+<span class="nc" id="L102">    }</span>
+
+    /**
+     * 
+     * (Required)
+     * 
+     */
+    public String getCVEDataVersion() {
+<span class="nc" id="L110">        return cVEDataVersion;</span>
+    }
+
+    /**
+     * 
+     * (Required)
+     * 
+     */
+    public void setCVEDataVersion(String cVEDataVersion) {
+<span class="nc" id="L119">        this.cVEDataVersion = cVEDataVersion;</span>
+<span class="nc" id="L120">    }</span>
+
+    /**
+     * NVD adds number of CVE in this feed
+     * 
+     */
+    public String getCVEDataNumberOfCVEs() {
+<span class="nc" id="L127">        return cVEDataNumberOfCVEs;</span>
+    }
+
+    /**
+     * NVD adds number of CVE in this feed
+     * 
+     */
+    public void setCVEDataNumberOfCVEs(String cVEDataNumberOfCVEs) {
+<span class="nc" id="L135">        this.cVEDataNumberOfCVEs = cVEDataNumberOfCVEs;</span>
+<span class="nc" id="L136">    }</span>
+
+    /**
+     * NVD adds feed date timestamp
+     * 
+     */
+    public String getCVEDataTimestamp() {
+<span class="nc" id="L143">        return cVEDataTimestamp;</span>
+    }
+
+    /**
+     * NVD adds feed date timestamp
+     * 
+     */
+    public void setCVEDataTimestamp(String cVEDataTimestamp) {
+<span class="nc" id="L151">        this.cVEDataTimestamp = cVEDataTimestamp;</span>
+<span class="nc" id="L152">    }</span>
+
+    /**
+     * NVD feed array of CVE
+     * (Required)
+     * 
+     */
+    public List&lt;CVEItem&gt; getCVEItems() {
+<span class="nc" id="L160">        return cVEItems;</span>
+    }
+
+    /**
+     * NVD feed array of CVE
+     * (Required)
+     * 
+     */
+    public void setCVEItems(List&lt;CVEItem&gt; cVEItems) {
+<span class="nc" id="L169">        this.cVEItems = cVEItems;</span>
+<span class="nc" id="L170">    }</span>
+
+    @Override
+    public String toString() {
+<span class="nc" id="L174">        return new ToStringBuilder(this).append(&quot;cVEDataType&quot;, cVEDataType).append(&quot;cVEDataFormat&quot;, cVEDataFormat).append(&quot;cVEDataVersion&quot;, cVEDataVersion).append(&quot;cVEDataNumberOfCVEs&quot;, cVEDataNumberOfCVEs).append(&quot;cVEDataTimestamp&quot;, cVEDataTimestamp).append(&quot;cVEItems&quot;, cVEItems).toString();</span>
+    }
+
+    @Override
+    public int hashCode() {
+<span class="nc" id="L179">        return new HashCodeBuilder().append(cVEDataNumberOfCVEs).append(cVEDataFormat).append(cVEDataTimestamp).append(cVEDataType).append(cVEItems).append(cVEDataVersion).toHashCode();</span>
+    }
+
+    @Override
+    public boolean equals(Object other) {
+<span class="nc bnc" id="L184" title="All 2 branches missed.">        if (other == this) {</span>
+<span class="nc" id="L185">            return true;</span>
+        }
+<span class="nc bnc" id="L187" title="All 2 branches missed.">        if ((other instanceof NvdCveFeedJson10) == false) {</span>
+<span class="nc" id="L188">            return false;</span>
+        }
+<span class="nc" id="L190">        NvdCveFeedJson10 rhs = ((NvdCveFeedJson10) other);</span>
+<span class="nc" id="L191">        return new EqualsBuilder().append(cVEDataNumberOfCVEs, rhs.cVEDataNumberOfCVEs).append(cVEDataFormat, rhs.cVEDataFormat).append(cVEDataTimestamp, rhs.cVEDataTimestamp).append(cVEDataType, rhs.cVEDataType).append(cVEItems, rhs.cVEItems).append(cVEDataVersion, rhs.cVEDataVersion).isEquals();</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.2.201808211720</span></div></body></html>

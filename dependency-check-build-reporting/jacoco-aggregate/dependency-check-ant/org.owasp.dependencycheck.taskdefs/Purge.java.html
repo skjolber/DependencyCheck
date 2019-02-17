@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../jacoco-resources/report.gif" type="image/gif"/><title>Purge.java</title><link rel="stylesheet" href="../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../index.html" class="el_report">Dependency-Check Build-Reporting</a> &gt; <a href="../index.html" class="el_bundle">dependency-check-ant</a> &gt; <a href="index.source.html" class="el_package">org.owasp.dependencycheck.taskdefs</a> &gt; <span class="el_source">Purge.java</span></div><h1>Purge.java</h1><pre class="source lang-java linenums">/*
+ * This file is part of dependency-check-ant.
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ * Copyright (c) 2015 Jeremy Long. All Rights Reserved.
+ */
+package org.owasp.dependencycheck.taskdefs;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import org.apache.tools.ant.BuildException;
+import org.apache.tools.ant.Project;
+import org.apache.tools.ant.Task;
+import org.owasp.dependencycheck.utils.Settings;
+import org.slf4j.impl.StaticLoggerBinder;
+
+/**
+ * An Ant task definition to execute dependency-check during an Ant build.
+ *
+ * @author Jeremy Long
+ */
+public class Purge extends Task {
+
+    /**
+     * The properties file location.
+     */
+    private static final String PROPERTIES_FILE = &quot;task.properties&quot;;
+    /**
+     * The configured settings.
+     */
+    private Settings settings;
+
+    /**
+     * The location of the data directory that contains
+     */
+<span class="fc" id="L48">    private String dataDirectory = null;</span>
+    /**
+     * Indicates if dependency-check should fail the build if an exception
+     * occurs.
+     */
+<span class="fc" id="L53">    private boolean failOnError = true;</span>
+
+    /**
+     * Construct a new DependencyCheckTask.
+     */
+    public Purge() {
+<span class="fc" id="L59">        super();</span>
+
+        // Call this before Dependency Check Core starts logging anything - this way, all SLF4J messages from
+        // core end up coming through this tasks logger
+<span class="fc" id="L63">        StaticLoggerBinder.getSingleton().setTask(this);</span>
+<span class="fc" id="L64">    }</span>
+
+    public Settings getSettings() {
+<span class="fc" id="L67">        return settings;</span>
+    }
+
+    /**
+     * Get the value of dataDirectory.
+     *
+     * @return the value of dataDirectory
+     */
+    public String getDataDirectory() {
+<span class="nc" id="L76">        return dataDirectory;</span>
+    }
+
+    /**
+     * Set the value of dataDirectory.
+     *
+     * @param dataDirectory new value of dataDirectory
+     */
+    public void setDataDirectory(String dataDirectory) {
+<span class="nc" id="L85">        this.dataDirectory = dataDirectory;</span>
+<span class="nc" id="L86">    }</span>
+
+    /**
+     * Get the value of failOnError.
+     *
+     * @return the value of failOnError
+     */
+    public boolean isFailOnError() {
+<span class="nc" id="L94">        return failOnError;</span>
+    }
+
+    /**
+     * Set the value of failOnError.
+     *
+     * @param failOnError new value of failOnError
+     */
+    public void setFailOnError(boolean failOnError) {
+<span class="nc" id="L103">        this.failOnError = failOnError;</span>
+<span class="nc" id="L104">    }</span>
+
+    /**
+     * Executes the dependency-check purge to delete the existing local copy of
+     * the NVD CVE data.
+     *
+     * @throws BuildException thrown if there is a problem deleting the file(s)
+     */
+    @Override
+    public void execute() throws BuildException {
+<span class="nc" id="L114">        populateSettings();</span>
+        final File db;
+        try {
+<span class="nc" id="L117">            db = new File(getSettings().getDataDirectory(), getSettings().getString(Settings.KEYS.DB_FILE_NAME, &quot;dc.mv.db&quot;));</span>
+<span class="nc bnc" id="L118" title="All 2 branches missed.">            if (db.exists()) {</span>
+<span class="nc bnc" id="L119" title="All 2 branches missed.">                if (db.delete()) {</span>
+<span class="nc" id="L120">                    log(&quot;Database file purged; local copy of the NVD has been removed&quot;, Project.MSG_INFO);</span>
+                } else {
+<span class="nc" id="L122">                    final String msg = String.format(&quot;Unable to delete '%s'; please delete the file manually&quot;, db.getAbsolutePath());</span>
+<span class="nc bnc" id="L123" title="All 2 branches missed.">                    if (this.failOnError) {</span>
+<span class="nc" id="L124">                        throw new BuildException(msg);</span>
+                    }
+<span class="nc" id="L126">                    log(msg, Project.MSG_ERR);</span>
+<span class="nc" id="L127">                }</span>
+            } else {
+<span class="nc" id="L129">                final String msg = String.format(&quot;Unable to purge database; the database file does not exist: %s&quot;, db.getAbsolutePath());</span>
+<span class="nc bnc" id="L130" title="All 2 branches missed.">                if (this.failOnError) {</span>
+<span class="nc" id="L131">                    throw new BuildException(msg);</span>
+                }
+<span class="nc" id="L133">                log(msg, Project.MSG_ERR);</span>
+            }
+<span class="nc" id="L135">        } catch (IOException ex) {</span>
+<span class="nc" id="L136">            final String msg = &quot;Unable to delete the database&quot;;</span>
+<span class="nc bnc" id="L137" title="All 2 branches missed.">            if (this.failOnError) {</span>
+<span class="nc" id="L138">                throw new BuildException(msg);</span>
+            }
+<span class="nc" id="L140">            log(msg, Project.MSG_ERR);</span>
+        } finally {
+<span class="nc" id="L142">            settings.cleanup(true);</span>
+        }
+<span class="nc" id="L144">    }</span>
+
+    /**
+     * Takes the properties supplied and updates the dependency-check settings.
+     * Additionally, this sets the system properties required to change the
+     * proxy server, port, and connection timeout.
+     *
+     * @throws BuildException thrown if the properties file cannot be read.
+     */
+    protected void populateSettings() throws BuildException {
+<span class="fc" id="L154">        settings = new Settings();</span>
+<span class="fc" id="L155">        try (InputStream taskProperties = this.getClass().getClassLoader().getResourceAsStream(PROPERTIES_FILE)) {</span>
+<span class="fc" id="L156">            settings.mergeProperties(taskProperties);</span>
+<span class="nc" id="L157">        } catch (IOException ex) {</span>
+<span class="nc" id="L158">            final String msg = &quot;Unable to load the dependency-check ant task.properties file.&quot;;</span>
+<span class="nc bnc" id="L159" title="All 2 branches missed.">            if (this.failOnError) {</span>
+<span class="nc" id="L160">                throw new BuildException(msg, ex);</span>
+            }
+<span class="nc" id="L162">            log(msg, ex, Project.MSG_WARN);</span>
+<span class="fc" id="L163">        }</span>
+<span class="pc bpc" id="L164" title="1 of 2 branches missed.">        if (dataDirectory != null) {</span>
+<span class="nc" id="L165">            settings.setString(Settings.KEYS.DATA_DIRECTORY, dataDirectory);</span>
+        } else {
+<span class="fc" id="L167">            final File jarPath = new File(Purge.class.getProtectionDomain().getCodeSource().getLocation().getPath());</span>
+<span class="fc" id="L168">            final File base = jarPath.getParentFile();</span>
+<span class="fc" id="L169">            final String sub = settings.getString(Settings.KEYS.DATA_DIRECTORY);</span>
+<span class="fc" id="L170">            final File dataDir = new File(base, sub);</span>
+<span class="fc" id="L171">            settings.setString(Settings.KEYS.DATA_DIRECTORY, dataDir.getAbsolutePath());</span>
+        }
+<span class="fc" id="L173">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.2.201808211720</span></div></body></html>

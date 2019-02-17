@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../jacoco-resources/report.gif" type="image/gif"/><title>Pair.java</title><link rel="stylesheet" href="../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../index.html" class="el_report">Dependency-Check Ant Task</a> &gt; <a href="../index.html" class="el_bundle">dependency-check-core</a> &gt; <a href="index.source.html" class="el_package">org.owasp.dependencycheck.utils</a> &gt; <span class="el_source">Pair.java</span></div><h1>Pair.java</h1><pre class="source lang-java linenums">/*
+ * This file is part of dependency-check-core.
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ * Copyright (c) 2014 Jeremy Long. All Rights Reserved.
+ */
+package org.owasp.dependencycheck.utils;
+
+import javax.annotation.concurrent.ThreadSafe;
+
+/**
+ * A generic pair of elements.
+ *
+ * @param &lt;L&gt; the type for the left element in the pair
+ * @param &lt;R&gt; the type for the right element in the pair
+ *
+ * @author Jeremy Long
+ */
+@ThreadSafe
+public class Pair&lt;L, R&gt; {
+
+    /**
+     * The left element of the pair.
+     */
+<span class="pc" id="L36">    private L left = null;</span>
+    /**
+     * The right element of the pair.
+     */
+<span class="pc" id="L40">    private R right = null;</span>
+
+    /**
+     * Constructs a new empty pair.
+     */
+<span class="nc" id="L45">    public Pair() {</span>
+<span class="nc" id="L46">    }</span>
+
+    /**
+     * Constructs a new Pair with the given left and right values.
+     *
+     * @param left the value for the left pair
+     * @param right the value for the right pair
+     */
+<span class="fc" id="L54">    public Pair(L left, R right) {</span>
+<span class="fc" id="L55">        this.left = left;</span>
+<span class="fc" id="L56">        this.right = right;</span>
+<span class="fc" id="L57">    }</span>
+
+    /**
+     * Get the value of left.
+     *
+     * @return the value of left
+     */
+    public L getLeft() {
+<span class="fc" id="L65">        return left;</span>
+    }
+
+    /**
+     * Set the value of left.
+     *
+     * @param left new value of left
+     */
+    public void setLeft(L left) {
+<span class="nc" id="L74">        this.left = left;</span>
+<span class="nc" id="L75">    }</span>
+
+    /**
+     * Get the value of right.
+     *
+     * @return the value of right
+     */
+    public R getRight() {
+<span class="fc" id="L83">        return right;</span>
+    }
+
+    /**
+     * Set the value of right.
+     *
+     * @param right new value of right
+     */
+    public void setRight(R right) {
+<span class="nc" id="L92">        this.right = right;</span>
+<span class="nc" id="L93">    }</span>
+
+    /**
+     * Generates the hash code using the hash codes from the contained objects.
+     *
+     * @return the hash code of the Pair
+     */
+    @Override
+    public int hashCode() {
+<span class="fc" id="L102">        int hash = 3;</span>
+<span class="pc bpc" id="L103" title="1 of 2 branches missed.">        hash = 53 * hash + (this.left != null ? this.left.hashCode() : 0);</span>
+<span class="pc bpc" id="L104" title="1 of 2 branches missed.">        hash = 53 * hash + (this.right != null ? this.right.hashCode() : 0);</span>
+<span class="fc" id="L105">        return hash;</span>
+    }
+
+    /**
+     * Determines the equality of this and the provided object.
+     *
+     * @param obj the {@link Object} to check for equality to this
+     * @return true if this and the provided {@link Object} are equal; otherwise
+     * false
+     */
+    @Override
+    public boolean equals(Object obj) {
+<span class="nc bnc" id="L117" title="All 2 branches missed.">        if (obj == null) {</span>
+<span class="nc" id="L118">            return false;</span>
+        }
+<span class="nc bnc" id="L120" title="All 2 branches missed.">        if (!(obj instanceof Pair)) {</span>
+<span class="nc" id="L121">            return false;</span>
+        }
+<span class="nc" id="L123">        final Pair&lt;?, ?&gt; other = (Pair&lt;?, ?&gt;) obj;</span>
+<span class="nc bnc" id="L124" title="All 6 branches missed.">        if (this.left != other.left &amp;&amp; (this.left == null || !this.left.equals(other.left))) {</span>
+<span class="nc" id="L125">            return false;</span>
+        }
+<span class="nc bnc" id="L127" title="All 6 branches missed.">        return !(this.right != other.right &amp;&amp; (this.right == null || !this.right.equals(other.right)));</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.2.201808211720</span></div></body></html>

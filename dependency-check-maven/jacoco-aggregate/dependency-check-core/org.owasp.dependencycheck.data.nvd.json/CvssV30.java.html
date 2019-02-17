@@ -1,0 +1,1189 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../jacoco-resources/report.gif" type="image/gif"/><title>CvssV30.java</title><link rel="stylesheet" href="../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../index.html" class="el_report">Dependency-Check Maven Plugin</a> &gt; <a href="../index.html" class="el_bundle">dependency-check-core</a> &gt; <a href="index.source.html" class="el_package">org.owasp.dependencycheck.data.nvd.json</a> &gt; <span class="el_source">CvssV30.java</span></div><h1>CvssV30.java</h1><pre class="source lang-java linenums">
+package org.owasp.dependencycheck.data.nvd.json;
+
+import java.util.HashMap;
+import java.util.Map;
+import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+
+
+/**
+ * JSON Schema for Common Vulnerability Scoring System version 3.0
+ * &lt;p&gt;
+ * 
+ * 
+ */
+<span class="fc" id="L19">public class CvssV30 {</span>
+
+    /**
+     * CVSS Version
+     * (Required)
+     * 
+     */
+    @SerializedName(&quot;version&quot;)
+    @Expose
+    private CvssV30 .Version version;
+    /**
+     * 
+     * (Required)
+     * 
+     */
+    @SerializedName(&quot;vectorString&quot;)
+    @Expose
+    private String vectorString;
+    @SerializedName(&quot;attackVector&quot;)
+    @Expose
+    private CvssV30 .AttackVector attackVector;
+    @SerializedName(&quot;attackComplexity&quot;)
+    @Expose
+    private CvssV30 .AttackComplexity attackComplexity;
+    @SerializedName(&quot;privilegesRequired&quot;)
+    @Expose
+    private CvssV30 .PrivilegesRequired privilegesRequired;
+    @SerializedName(&quot;userInteraction&quot;)
+    @Expose
+    private CvssV30 .UserInteraction userInteraction;
+    @SerializedName(&quot;scope&quot;)
+    @Expose
+    private CvssV30 .Scope scope;
+    @SerializedName(&quot;confidentialityImpact&quot;)
+    @Expose
+    private CvssV30 .ConfidentialityImpact confidentialityImpact;
+    @SerializedName(&quot;integrityImpact&quot;)
+    @Expose
+    private CvssV30 .ConfidentialityImpact integrityImpact;
+    @SerializedName(&quot;availabilityImpact&quot;)
+    @Expose
+    private CvssV30 .ConfidentialityImpact availabilityImpact;
+    /**
+     * 
+     * (Required)
+     * 
+     */
+    @SerializedName(&quot;baseScore&quot;)
+    @Expose
+    private Double baseScore;
+    /**
+     * 
+     * (Required)
+     * 
+     */
+    @SerializedName(&quot;baseSeverity&quot;)
+    @Expose
+    private CvssV30 .BaseSeverity baseSeverity;
+    @SerializedName(&quot;exploitCodeMaturity&quot;)
+    @Expose
+    private CvssV30 .ExploitCodeMaturity exploitCodeMaturity;
+    @SerializedName(&quot;remediationLevel&quot;)
+    @Expose
+    private CvssV30 .RemediationLevel remediationLevel;
+    @SerializedName(&quot;reportConfidence&quot;)
+    @Expose
+    private CvssV30 .ReportConfidence reportConfidence;
+    @SerializedName(&quot;temporalScore&quot;)
+    @Expose
+    private Double temporalScore;
+    @SerializedName(&quot;temporalSeverity&quot;)
+    @Expose
+    private CvssV30 .BaseSeverity temporalSeverity;
+    @SerializedName(&quot;confidentialityRequirement&quot;)
+    @Expose
+    private CvssV30 .ConfidentialityRequirement confidentialityRequirement;
+    @SerializedName(&quot;integrityRequirement&quot;)
+    @Expose
+    private CvssV30 .ConfidentialityRequirement integrityRequirement;
+    @SerializedName(&quot;availabilityRequirement&quot;)
+    @Expose
+    private CvssV30 .ConfidentialityRequirement availabilityRequirement;
+    @SerializedName(&quot;modifiedAttackVector&quot;)
+    @Expose
+    private CvssV30 .ModifiedAttackVector modifiedAttackVector;
+    @SerializedName(&quot;modifiedAttackComplexity&quot;)
+    @Expose
+    private CvssV30 .ModifiedAttackComplexity modifiedAttackComplexity;
+    @SerializedName(&quot;modifiedPrivilegesRequired&quot;)
+    @Expose
+    private CvssV30 .ModifiedPrivilegesRequired modifiedPrivilegesRequired;
+    @SerializedName(&quot;modifiedUserInteraction&quot;)
+    @Expose
+    private CvssV30 .ModifiedUserInteraction modifiedUserInteraction;
+    @SerializedName(&quot;modifiedScope&quot;)
+    @Expose
+    private CvssV30 .ModifiedScope modifiedScope;
+    @SerializedName(&quot;modifiedConfidentialityImpact&quot;)
+    @Expose
+    private CvssV30 .ModifiedConfidentialityImpact modifiedConfidentialityImpact;
+    @SerializedName(&quot;modifiedIntegrityImpact&quot;)
+    @Expose
+    private CvssV30 .ModifiedConfidentialityImpact modifiedIntegrityImpact;
+    @SerializedName(&quot;modifiedAvailabilityImpact&quot;)
+    @Expose
+    private CvssV30 .ModifiedConfidentialityImpact modifiedAvailabilityImpact;
+    @SerializedName(&quot;environmentalScore&quot;)
+    @Expose
+    private Double environmentalScore;
+    @SerializedName(&quot;environmentalSeverity&quot;)
+    @Expose
+    private CvssV30 .BaseSeverity environmentalSeverity;
+
+    /**
+     * CVSS Version
+     * (Required)
+     * 
+     */
+    public CvssV30 .Version getVersion() {
+<span class="nc" id="L138">        return version;</span>
+    }
+
+    /**
+     * CVSS Version
+     * (Required)
+     * 
+     */
+    public void setVersion(CvssV30 .Version version) {
+<span class="nc" id="L147">        this.version = version;</span>
+<span class="nc" id="L148">    }</span>
+
+    /**
+     * 
+     * (Required)
+     * 
+     */
+    public String getVectorString() {
+<span class="nc" id="L156">        return vectorString;</span>
+    }
+
+    /**
+     * 
+     * (Required)
+     * 
+     */
+    public void setVectorString(String vectorString) {
+<span class="nc" id="L165">        this.vectorString = vectorString;</span>
+<span class="nc" id="L166">    }</span>
+
+    public CvssV30 .AttackVector getAttackVector() {
+<span class="fc" id="L169">        return attackVector;</span>
+    }
+
+    public void setAttackVector(CvssV30 .AttackVector attackVector) {
+<span class="nc" id="L173">        this.attackVector = attackVector;</span>
+<span class="nc" id="L174">    }</span>
+
+    public CvssV30 .AttackComplexity getAttackComplexity() {
+<span class="fc" id="L177">        return attackComplexity;</span>
+    }
+
+    public void setAttackComplexity(CvssV30 .AttackComplexity attackComplexity) {
+<span class="nc" id="L181">        this.attackComplexity = attackComplexity;</span>
+<span class="nc" id="L182">    }</span>
+
+    public CvssV30 .PrivilegesRequired getPrivilegesRequired() {
+<span class="fc" id="L185">        return privilegesRequired;</span>
+    }
+
+    public void setPrivilegesRequired(CvssV30 .PrivilegesRequired privilegesRequired) {
+<span class="nc" id="L189">        this.privilegesRequired = privilegesRequired;</span>
+<span class="nc" id="L190">    }</span>
+
+    public CvssV30 .UserInteraction getUserInteraction() {
+<span class="fc" id="L193">        return userInteraction;</span>
+    }
+
+    public void setUserInteraction(CvssV30 .UserInteraction userInteraction) {
+<span class="nc" id="L197">        this.userInteraction = userInteraction;</span>
+<span class="nc" id="L198">    }</span>
+
+    public CvssV30 .Scope getScope() {
+<span class="fc" id="L201">        return scope;</span>
+    }
+
+    public void setScope(CvssV30 .Scope scope) {
+<span class="nc" id="L205">        this.scope = scope;</span>
+<span class="nc" id="L206">    }</span>
+
+    public CvssV30 .ConfidentialityImpact getConfidentialityImpact() {
+<span class="fc" id="L209">        return confidentialityImpact;</span>
+    }
+
+    public void setConfidentialityImpact(CvssV30 .ConfidentialityImpact confidentialityImpact) {
+<span class="nc" id="L213">        this.confidentialityImpact = confidentialityImpact;</span>
+<span class="nc" id="L214">    }</span>
+
+    public CvssV30 .ConfidentialityImpact getIntegrityImpact() {
+<span class="fc" id="L217">        return integrityImpact;</span>
+    }
+
+    public void setIntegrityImpact(CvssV30 .ConfidentialityImpact integrityImpact) {
+<span class="nc" id="L221">        this.integrityImpact = integrityImpact;</span>
+<span class="nc" id="L222">    }</span>
+
+    public CvssV30 .ConfidentialityImpact getAvailabilityImpact() {
+<span class="fc" id="L225">        return availabilityImpact;</span>
+    }
+
+    public void setAvailabilityImpact(CvssV30 .ConfidentialityImpact availabilityImpact) {
+<span class="nc" id="L229">        this.availabilityImpact = availabilityImpact;</span>
+<span class="nc" id="L230">    }</span>
+
+    /**
+     * 
+     * (Required)
+     * 
+     */
+    public Double getBaseScore() {
+<span class="fc" id="L238">        return baseScore;</span>
+    }
+
+    /**
+     * 
+     * (Required)
+     * 
+     */
+    public void setBaseScore(Double baseScore) {
+<span class="nc" id="L247">        this.baseScore = baseScore;</span>
+<span class="nc" id="L248">    }</span>
+
+    /**
+     * 
+     * (Required)
+     * 
+     */
+    public CvssV30 .BaseSeverity getBaseSeverity() {
+<span class="fc" id="L256">        return baseSeverity;</span>
+    }
+
+    /**
+     * 
+     * (Required)
+     * 
+     */
+    public void setBaseSeverity(CvssV30 .BaseSeverity baseSeverity) {
+<span class="nc" id="L265">        this.baseSeverity = baseSeverity;</span>
+<span class="nc" id="L266">    }</span>
+
+    public CvssV30 .ExploitCodeMaturity getExploitCodeMaturity() {
+<span class="nc" id="L269">        return exploitCodeMaturity;</span>
+    }
+
+    public void setExploitCodeMaturity(CvssV30 .ExploitCodeMaturity exploitCodeMaturity) {
+<span class="nc" id="L273">        this.exploitCodeMaturity = exploitCodeMaturity;</span>
+<span class="nc" id="L274">    }</span>
+
+    public CvssV30 .RemediationLevel getRemediationLevel() {
+<span class="nc" id="L277">        return remediationLevel;</span>
+    }
+
+    public void setRemediationLevel(CvssV30 .RemediationLevel remediationLevel) {
+<span class="nc" id="L281">        this.remediationLevel = remediationLevel;</span>
+<span class="nc" id="L282">    }</span>
+
+    public CvssV30 .ReportConfidence getReportConfidence() {
+<span class="nc" id="L285">        return reportConfidence;</span>
+    }
+
+    public void setReportConfidence(CvssV30 .ReportConfidence reportConfidence) {
+<span class="nc" id="L289">        this.reportConfidence = reportConfidence;</span>
+<span class="nc" id="L290">    }</span>
+
+    public Double getTemporalScore() {
+<span class="nc" id="L293">        return temporalScore;</span>
+    }
+
+    public void setTemporalScore(Double temporalScore) {
+<span class="nc" id="L297">        this.temporalScore = temporalScore;</span>
+<span class="nc" id="L298">    }</span>
+
+    public CvssV30 .BaseSeverity getTemporalSeverity() {
+<span class="nc" id="L301">        return temporalSeverity;</span>
+    }
+
+    public void setTemporalSeverity(CvssV30 .BaseSeverity temporalSeverity) {
+<span class="nc" id="L305">        this.temporalSeverity = temporalSeverity;</span>
+<span class="nc" id="L306">    }</span>
+
+    public CvssV30 .ConfidentialityRequirement getConfidentialityRequirement() {
+<span class="nc" id="L309">        return confidentialityRequirement;</span>
+    }
+
+    public void setConfidentialityRequirement(CvssV30 .ConfidentialityRequirement confidentialityRequirement) {
+<span class="nc" id="L313">        this.confidentialityRequirement = confidentialityRequirement;</span>
+<span class="nc" id="L314">    }</span>
+
+    public CvssV30 .ConfidentialityRequirement getIntegrityRequirement() {
+<span class="nc" id="L317">        return integrityRequirement;</span>
+    }
+
+    public void setIntegrityRequirement(CvssV30 .ConfidentialityRequirement integrityRequirement) {
+<span class="nc" id="L321">        this.integrityRequirement = integrityRequirement;</span>
+<span class="nc" id="L322">    }</span>
+
+    public CvssV30 .ConfidentialityRequirement getAvailabilityRequirement() {
+<span class="nc" id="L325">        return availabilityRequirement;</span>
+    }
+
+    public void setAvailabilityRequirement(CvssV30 .ConfidentialityRequirement availabilityRequirement) {
+<span class="nc" id="L329">        this.availabilityRequirement = availabilityRequirement;</span>
+<span class="nc" id="L330">    }</span>
+
+    public CvssV30 .ModifiedAttackVector getModifiedAttackVector() {
+<span class="nc" id="L333">        return modifiedAttackVector;</span>
+    }
+
+    public void setModifiedAttackVector(CvssV30 .ModifiedAttackVector modifiedAttackVector) {
+<span class="nc" id="L337">        this.modifiedAttackVector = modifiedAttackVector;</span>
+<span class="nc" id="L338">    }</span>
+
+    public CvssV30 .ModifiedAttackComplexity getModifiedAttackComplexity() {
+<span class="nc" id="L341">        return modifiedAttackComplexity;</span>
+    }
+
+    public void setModifiedAttackComplexity(CvssV30 .ModifiedAttackComplexity modifiedAttackComplexity) {
+<span class="nc" id="L345">        this.modifiedAttackComplexity = modifiedAttackComplexity;</span>
+<span class="nc" id="L346">    }</span>
+
+    public CvssV30 .ModifiedPrivilegesRequired getModifiedPrivilegesRequired() {
+<span class="nc" id="L349">        return modifiedPrivilegesRequired;</span>
+    }
+
+    public void setModifiedPrivilegesRequired(CvssV30 .ModifiedPrivilegesRequired modifiedPrivilegesRequired) {
+<span class="nc" id="L353">        this.modifiedPrivilegesRequired = modifiedPrivilegesRequired;</span>
+<span class="nc" id="L354">    }</span>
+
+    public CvssV30 .ModifiedUserInteraction getModifiedUserInteraction() {
+<span class="nc" id="L357">        return modifiedUserInteraction;</span>
+    }
+
+    public void setModifiedUserInteraction(CvssV30 .ModifiedUserInteraction modifiedUserInteraction) {
+<span class="nc" id="L361">        this.modifiedUserInteraction = modifiedUserInteraction;</span>
+<span class="nc" id="L362">    }</span>
+
+    public CvssV30 .ModifiedScope getModifiedScope() {
+<span class="nc" id="L365">        return modifiedScope;</span>
+    }
+
+    public void setModifiedScope(CvssV30 .ModifiedScope modifiedScope) {
+<span class="nc" id="L369">        this.modifiedScope = modifiedScope;</span>
+<span class="nc" id="L370">    }</span>
+
+    public CvssV30 .ModifiedConfidentialityImpact getModifiedConfidentialityImpact() {
+<span class="nc" id="L373">        return modifiedConfidentialityImpact;</span>
+    }
+
+    public void setModifiedConfidentialityImpact(CvssV30 .ModifiedConfidentialityImpact modifiedConfidentialityImpact) {
+<span class="nc" id="L377">        this.modifiedConfidentialityImpact = modifiedConfidentialityImpact;</span>
+<span class="nc" id="L378">    }</span>
+
+    public CvssV30 .ModifiedConfidentialityImpact getModifiedIntegrityImpact() {
+<span class="nc" id="L381">        return modifiedIntegrityImpact;</span>
+    }
+
+    public void setModifiedIntegrityImpact(CvssV30 .ModifiedConfidentialityImpact modifiedIntegrityImpact) {
+<span class="nc" id="L385">        this.modifiedIntegrityImpact = modifiedIntegrityImpact;</span>
+<span class="nc" id="L386">    }</span>
+
+    public CvssV30 .ModifiedConfidentialityImpact getModifiedAvailabilityImpact() {
+<span class="nc" id="L389">        return modifiedAvailabilityImpact;</span>
+    }
+
+    public void setModifiedAvailabilityImpact(CvssV30 .ModifiedConfidentialityImpact modifiedAvailabilityImpact) {
+<span class="nc" id="L393">        this.modifiedAvailabilityImpact = modifiedAvailabilityImpact;</span>
+<span class="nc" id="L394">    }</span>
+
+    public Double getEnvironmentalScore() {
+<span class="nc" id="L397">        return environmentalScore;</span>
+    }
+
+    public void setEnvironmentalScore(Double environmentalScore) {
+<span class="nc" id="L401">        this.environmentalScore = environmentalScore;</span>
+<span class="nc" id="L402">    }</span>
+
+    public CvssV30 .BaseSeverity getEnvironmentalSeverity() {
+<span class="nc" id="L405">        return environmentalSeverity;</span>
+    }
+
+    public void setEnvironmentalSeverity(CvssV30 .BaseSeverity environmentalSeverity) {
+<span class="nc" id="L409">        this.environmentalSeverity = environmentalSeverity;</span>
+<span class="nc" id="L410">    }</span>
+
+    @Override
+    public String toString() {
+<span class="nc" id="L414">        return new ToStringBuilder(this).append(&quot;version&quot;, version).append(&quot;vectorString&quot;, vectorString).append(&quot;attackVector&quot;, attackVector).append(&quot;attackComplexity&quot;, attackComplexity).append(&quot;privilegesRequired&quot;, privilegesRequired).append(&quot;userInteraction&quot;, userInteraction).append(&quot;scope&quot;, scope).append(&quot;confidentialityImpact&quot;, confidentialityImpact).append(&quot;integrityImpact&quot;, integrityImpact).append(&quot;availabilityImpact&quot;, availabilityImpact).append(&quot;baseScore&quot;, baseScore).append(&quot;baseSeverity&quot;, baseSeverity).append(&quot;exploitCodeMaturity&quot;, exploitCodeMaturity).append(&quot;remediationLevel&quot;, remediationLevel).append(&quot;reportConfidence&quot;, reportConfidence).append(&quot;temporalScore&quot;, temporalScore).append(&quot;temporalSeverity&quot;, temporalSeverity).append(&quot;confidentialityRequirement&quot;, confidentialityRequirement).append(&quot;integrityRequirement&quot;, integrityRequirement).append(&quot;availabilityRequirement&quot;, availabilityRequirement).append(&quot;modifiedAttackVector&quot;, modifiedAttackVector).append(&quot;modifiedAttackComplexity&quot;, modifiedAttackComplexity).append(&quot;modifiedPrivilegesRequired&quot;, modifiedPrivilegesRequired).append(&quot;modifiedUserInteraction&quot;, modifiedUserInteraction).append(&quot;modifiedScope&quot;, modifiedScope).append(&quot;modifiedConfidentialityImpact&quot;, modifiedConfidentialityImpact).append(&quot;modifiedIntegrityImpact&quot;, modifiedIntegrityImpact).append(&quot;modifiedAvailabilityImpact&quot;, modifiedAvailabilityImpact).append(&quot;environmentalScore&quot;, environmentalScore).append(&quot;environmentalSeverity&quot;, environmentalSeverity).toString();</span>
+    }
+
+    @Override
+    public int hashCode() {
+<span class="nc" id="L419">        return new HashCodeBuilder().append(modifiedPrivilegesRequired).append(reportConfidence).append(modifiedConfidentialityImpact).append(availabilityImpact).append(privilegesRequired).append(baseScore).append(temporalSeverity).append(userInteraction).append(integrityRequirement).append(modifiedAvailabilityImpact).append(availabilityRequirement).append(modifiedScope).append(attackComplexity).append(scope).append(attackVector).append(integrityImpact).append(modifiedIntegrityImpact).append(vectorString).append(exploitCodeMaturity).append(temporalScore).append(modifiedAttackVector).append(version).append(confidentialityRequirement).append(remediationLevel).append(modifiedUserInteraction).append(modifiedAttackComplexity).append(baseSeverity).append(confidentialityImpact).append(environmentalScore).append(environmentalSeverity).toHashCode();</span>
+    }
+
+    @Override
+    public boolean equals(Object other) {
+<span class="nc bnc" id="L424" title="All 2 branches missed.">        if (other == this) {</span>
+<span class="nc" id="L425">            return true;</span>
+        }
+<span class="nc bnc" id="L427" title="All 2 branches missed.">        if ((other instanceof CvssV30) == false) {</span>
+<span class="nc" id="L428">            return false;</span>
+        }
+<span class="nc" id="L430">        CvssV30 rhs = ((CvssV30) other);</span>
+<span class="nc" id="L431">        return new EqualsBuilder().append(modifiedPrivilegesRequired, rhs.modifiedPrivilegesRequired).append(reportConfidence, rhs.reportConfidence).append(modifiedConfidentialityImpact, rhs.modifiedConfidentialityImpact).append(availabilityImpact, rhs.availabilityImpact).append(privilegesRequired, rhs.privilegesRequired).append(baseScore, rhs.baseScore).append(temporalSeverity, rhs.temporalSeverity).append(userInteraction, rhs.userInteraction).append(integrityRequirement, rhs.integrityRequirement).append(modifiedAvailabilityImpact, rhs.modifiedAvailabilityImpact).append(availabilityRequirement, rhs.availabilityRequirement).append(modifiedScope, rhs.modifiedScope).append(attackComplexity, rhs.attackComplexity).append(scope, rhs.scope).append(attackVector, rhs.attackVector).append(integrityImpact, rhs.integrityImpact).append(modifiedIntegrityImpact, rhs.modifiedIntegrityImpact).append(vectorString, rhs.vectorString).append(exploitCodeMaturity, rhs.exploitCodeMaturity).append(temporalScore, rhs.temporalScore).append(modifiedAttackVector, rhs.modifiedAttackVector).append(version, rhs.version).append(confidentialityRequirement, rhs.confidentialityRequirement).append(remediationLevel, rhs.remediationLevel).append(modifiedUserInteraction, rhs.modifiedUserInteraction).append(modifiedAttackComplexity, rhs.modifiedAttackComplexity).append(baseSeverity, rhs.baseSeverity).append(confidentialityImpact, rhs.confidentialityImpact).append(environmentalScore, rhs.environmentalScore).append(environmentalSeverity, rhs.environmentalSeverity).isEquals();</span>
+    }
+
+<span class="fc" id="L434">    public enum AttackComplexity {</span>
+
+<span class="fc" id="L436">        @SerializedName(&quot;HIGH&quot;)</span>
+        HIGH(&quot;HIGH&quot;),
+<span class="fc" id="L438">        @SerializedName(&quot;LOW&quot;)</span>
+        LOW(&quot;LOW&quot;);
+        private final String value;
+<span class="fc" id="L441">        private final static Map&lt;String, CvssV30 .AttackComplexity&gt; CONSTANTS = new HashMap&lt;String, CvssV30 .AttackComplexity&gt;();</span>
+
+        static {
+<span class="fc bfc" id="L444" title="All 2 branches covered.">            for (CvssV30 .AttackComplexity c: values()) {</span>
+<span class="fc" id="L445">                CONSTANTS.put(c.value, c);</span>
+            }
+<span class="fc" id="L447">        }</span>
+
+<span class="fc" id="L449">        private AttackComplexity(String value) {</span>
+<span class="fc" id="L450">            this.value = value;</span>
+<span class="fc" id="L451">        }</span>
+
+        @Override
+        public String toString() {
+<span class="nc" id="L455">            return this.value;</span>
+        }
+
+        public String value() {
+<span class="fc" id="L459">            return this.value;</span>
+        }
+
+        public static CvssV30 .AttackComplexity fromValue(String value) {
+<span class="nc" id="L463">            CvssV30 .AttackComplexity constant = CONSTANTS.get(value);</span>
+<span class="nc bnc" id="L464" title="All 2 branches missed.">            if (constant == null) {</span>
+<span class="nc" id="L465">                throw new IllegalArgumentException(value);</span>
+            } else {
+<span class="nc" id="L467">                return constant;</span>
+            }
+        }
+
+    }
+
+<span class="fc" id="L473">    public enum AttackVector {</span>
+
+<span class="fc" id="L475">        @SerializedName(&quot;NETWORK&quot;)</span>
+        NETWORK(&quot;NETWORK&quot;),
+<span class="fc" id="L477">        @SerializedName(&quot;ADJACENT_NETWORK&quot;)</span>
+        ADJACENT_NETWORK(&quot;ADJACENT_NETWORK&quot;),
+<span class="fc" id="L479">        @SerializedName(&quot;LOCAL&quot;)</span>
+        LOCAL(&quot;LOCAL&quot;),
+<span class="fc" id="L481">        @SerializedName(&quot;PHYSICAL&quot;)</span>
+        PHYSICAL(&quot;PHYSICAL&quot;);
+        private final String value;
+<span class="fc" id="L484">        private final static Map&lt;String, CvssV30 .AttackVector&gt; CONSTANTS = new HashMap&lt;String, CvssV30 .AttackVector&gt;();</span>
+
+        static {
+<span class="fc bfc" id="L487" title="All 2 branches covered.">            for (CvssV30 .AttackVector c: values()) {</span>
+<span class="fc" id="L488">                CONSTANTS.put(c.value, c);</span>
+            }
+<span class="fc" id="L490">        }</span>
+
+<span class="fc" id="L492">        private AttackVector(String value) {</span>
+<span class="fc" id="L493">            this.value = value;</span>
+<span class="fc" id="L494">        }</span>
+
+        @Override
+        public String toString() {
+<span class="nc" id="L498">            return this.value;</span>
+        }
+
+        public String value() {
+<span class="fc" id="L502">            return this.value;</span>
+        }
+
+        public static CvssV30 .AttackVector fromValue(String value) {
+<span class="nc" id="L506">            CvssV30 .AttackVector constant = CONSTANTS.get(value);</span>
+<span class="nc bnc" id="L507" title="All 2 branches missed.">            if (constant == null) {</span>
+<span class="nc" id="L508">                throw new IllegalArgumentException(value);</span>
+            } else {
+<span class="nc" id="L510">                return constant;</span>
+            }
+        }
+
+    }
+
+<span class="fc" id="L516">    public enum BaseSeverity {</span>
+
+<span class="fc" id="L518">        @SerializedName(&quot;NONE&quot;)</span>
+        NONE(&quot;NONE&quot;),
+<span class="fc" id="L520">        @SerializedName(&quot;LOW&quot;)</span>
+        LOW(&quot;LOW&quot;),
+<span class="fc" id="L522">        @SerializedName(&quot;MEDIUM&quot;)</span>
+        MEDIUM(&quot;MEDIUM&quot;),
+<span class="fc" id="L524">        @SerializedName(&quot;HIGH&quot;)</span>
+        HIGH(&quot;HIGH&quot;),
+<span class="fc" id="L526">        @SerializedName(&quot;CRITICAL&quot;)</span>
+        CRITICAL(&quot;CRITICAL&quot;);
+        private final String value;
+<span class="fc" id="L529">        private final static Map&lt;String, CvssV30 .BaseSeverity&gt; CONSTANTS = new HashMap&lt;String, CvssV30 .BaseSeverity&gt;();</span>
+
+        static {
+<span class="fc bfc" id="L532" title="All 2 branches covered.">            for (CvssV30 .BaseSeverity c: values()) {</span>
+<span class="fc" id="L533">                CONSTANTS.put(c.value, c);</span>
+            }
+<span class="fc" id="L535">        }</span>
+
+<span class="fc" id="L537">        private BaseSeverity(String value) {</span>
+<span class="fc" id="L538">            this.value = value;</span>
+<span class="fc" id="L539">        }</span>
+
+        @Override
+        public String toString() {
+<span class="nc" id="L543">            return this.value;</span>
+        }
+
+        public String value() {
+<span class="fc" id="L547">            return this.value;</span>
+        }
+
+        public static CvssV30 .BaseSeverity fromValue(String value) {
+<span class="nc" id="L551">            CvssV30 .BaseSeverity constant = CONSTANTS.get(value);</span>
+<span class="nc bnc" id="L552" title="All 2 branches missed.">            if (constant == null) {</span>
+<span class="nc" id="L553">                throw new IllegalArgumentException(value);</span>
+            } else {
+<span class="nc" id="L555">                return constant;</span>
+            }
+        }
+
+    }
+
+<span class="fc" id="L561">    public enum ConfidentialityImpact {</span>
+
+<span class="fc" id="L563">        @SerializedName(&quot;NONE&quot;)</span>
+        NONE(&quot;NONE&quot;),
+<span class="fc" id="L565">        @SerializedName(&quot;LOW&quot;)</span>
+        LOW(&quot;LOW&quot;),
+<span class="fc" id="L567">        @SerializedName(&quot;HIGH&quot;)</span>
+        HIGH(&quot;HIGH&quot;);
+        private final String value;
+<span class="fc" id="L570">        private final static Map&lt;String, CvssV30 .ConfidentialityImpact&gt; CONSTANTS = new HashMap&lt;String, CvssV30 .ConfidentialityImpact&gt;();</span>
+
+        static {
+<span class="fc bfc" id="L573" title="All 2 branches covered.">            for (CvssV30 .ConfidentialityImpact c: values()) {</span>
+<span class="fc" id="L574">                CONSTANTS.put(c.value, c);</span>
+            }
+<span class="fc" id="L576">        }</span>
+
+<span class="fc" id="L578">        private ConfidentialityImpact(String value) {</span>
+<span class="fc" id="L579">            this.value = value;</span>
+<span class="fc" id="L580">        }</span>
+
+        @Override
+        public String toString() {
+<span class="nc" id="L584">            return this.value;</span>
+        }
+
+        public String value() {
+<span class="fc" id="L588">            return this.value;</span>
+        }
+
+        public static CvssV30 .ConfidentialityImpact fromValue(String value) {
+<span class="nc" id="L592">            CvssV30 .ConfidentialityImpact constant = CONSTANTS.get(value);</span>
+<span class="nc bnc" id="L593" title="All 2 branches missed.">            if (constant == null) {</span>
+<span class="nc" id="L594">                throw new IllegalArgumentException(value);</span>
+            } else {
+<span class="nc" id="L596">                return constant;</span>
+            }
+        }
+
+    }
+
+<span class="fc" id="L602">    public enum ConfidentialityRequirement {</span>
+
+<span class="fc" id="L604">        @SerializedName(&quot;LOW&quot;)</span>
+        LOW(&quot;LOW&quot;),
+<span class="fc" id="L606">        @SerializedName(&quot;MEDIUM&quot;)</span>
+        MEDIUM(&quot;MEDIUM&quot;),
+<span class="fc" id="L608">        @SerializedName(&quot;HIGH&quot;)</span>
+        HIGH(&quot;HIGH&quot;),
+<span class="fc" id="L610">        @SerializedName(&quot;NOT_DEFINED&quot;)</span>
+        NOT_DEFINED(&quot;NOT_DEFINED&quot;);
+        private final String value;
+<span class="fc" id="L613">        private final static Map&lt;String, CvssV30 .ConfidentialityRequirement&gt; CONSTANTS = new HashMap&lt;String, CvssV30 .ConfidentialityRequirement&gt;();</span>
+
+        static {
+<span class="fc bfc" id="L616" title="All 2 branches covered.">            for (CvssV30 .ConfidentialityRequirement c: values()) {</span>
+<span class="fc" id="L617">                CONSTANTS.put(c.value, c);</span>
+            }
+<span class="fc" id="L619">        }</span>
+
+<span class="fc" id="L621">        private ConfidentialityRequirement(String value) {</span>
+<span class="fc" id="L622">            this.value = value;</span>
+<span class="fc" id="L623">        }</span>
+
+        @Override
+        public String toString() {
+<span class="nc" id="L627">            return this.value;</span>
+        }
+
+        public String value() {
+<span class="nc" id="L631">            return this.value;</span>
+        }
+
+        public static CvssV30 .ConfidentialityRequirement fromValue(String value) {
+<span class="nc" id="L635">            CvssV30 .ConfidentialityRequirement constant = CONSTANTS.get(value);</span>
+<span class="nc bnc" id="L636" title="All 2 branches missed.">            if (constant == null) {</span>
+<span class="nc" id="L637">                throw new IllegalArgumentException(value);</span>
+            } else {
+<span class="nc" id="L639">                return constant;</span>
+            }
+        }
+
+    }
+
+<span class="fc" id="L645">    public enum ExploitCodeMaturity {</span>
+
+<span class="fc" id="L647">        @SerializedName(&quot;UNPROVEN&quot;)</span>
+        UNPROVEN(&quot;UNPROVEN&quot;),
+<span class="fc" id="L649">        @SerializedName(&quot;PROOF_OF_CONCEPT&quot;)</span>
+        PROOF_OF_CONCEPT(&quot;PROOF_OF_CONCEPT&quot;),
+<span class="fc" id="L651">        @SerializedName(&quot;FUNCTIONAL&quot;)</span>
+        FUNCTIONAL(&quot;FUNCTIONAL&quot;),
+<span class="fc" id="L653">        @SerializedName(&quot;HIGH&quot;)</span>
+        HIGH(&quot;HIGH&quot;),
+<span class="fc" id="L655">        @SerializedName(&quot;NOT_DEFINED&quot;)</span>
+        NOT_DEFINED(&quot;NOT_DEFINED&quot;);
+        private final String value;
+<span class="fc" id="L658">        private final static Map&lt;String, CvssV30 .ExploitCodeMaturity&gt; CONSTANTS = new HashMap&lt;String, CvssV30 .ExploitCodeMaturity&gt;();</span>
+
+        static {
+<span class="fc bfc" id="L661" title="All 2 branches covered.">            for (CvssV30 .ExploitCodeMaturity c: values()) {</span>
+<span class="fc" id="L662">                CONSTANTS.put(c.value, c);</span>
+            }
+<span class="fc" id="L664">        }</span>
+
+<span class="fc" id="L666">        private ExploitCodeMaturity(String value) {</span>
+<span class="fc" id="L667">            this.value = value;</span>
+<span class="fc" id="L668">        }</span>
+
+        @Override
+        public String toString() {
+<span class="nc" id="L672">            return this.value;</span>
+        }
+
+        public String value() {
+<span class="nc" id="L676">            return this.value;</span>
+        }
+
+        public static CvssV30 .ExploitCodeMaturity fromValue(String value) {
+<span class="nc" id="L680">            CvssV30 .ExploitCodeMaturity constant = CONSTANTS.get(value);</span>
+<span class="nc bnc" id="L681" title="All 2 branches missed.">            if (constant == null) {</span>
+<span class="nc" id="L682">                throw new IllegalArgumentException(value);</span>
+            } else {
+<span class="nc" id="L684">                return constant;</span>
+            }
+        }
+
+    }
+
+<span class="fc" id="L690">    public enum ModifiedAttackComplexity {</span>
+
+<span class="fc" id="L692">        @SerializedName(&quot;HIGH&quot;)</span>
+        HIGH(&quot;HIGH&quot;),
+<span class="fc" id="L694">        @SerializedName(&quot;LOW&quot;)</span>
+        LOW(&quot;LOW&quot;),
+<span class="fc" id="L696">        @SerializedName(&quot;NOT_DEFINED&quot;)</span>
+        NOT_DEFINED(&quot;NOT_DEFINED&quot;);
+        private final String value;
+<span class="fc" id="L699">        private final static Map&lt;String, CvssV30 .ModifiedAttackComplexity&gt; CONSTANTS = new HashMap&lt;String, CvssV30 .ModifiedAttackComplexity&gt;();</span>
+
+        static {
+<span class="fc bfc" id="L702" title="All 2 branches covered.">            for (CvssV30 .ModifiedAttackComplexity c: values()) {</span>
+<span class="fc" id="L703">                CONSTANTS.put(c.value, c);</span>
+            }
+<span class="fc" id="L705">        }</span>
+
+<span class="fc" id="L707">        private ModifiedAttackComplexity(String value) {</span>
+<span class="fc" id="L708">            this.value = value;</span>
+<span class="fc" id="L709">        }</span>
+
+        @Override
+        public String toString() {
+<span class="nc" id="L713">            return this.value;</span>
+        }
+
+        public String value() {
+<span class="nc" id="L717">            return this.value;</span>
+        }
+
+        public static CvssV30 .ModifiedAttackComplexity fromValue(String value) {
+<span class="nc" id="L721">            CvssV30 .ModifiedAttackComplexity constant = CONSTANTS.get(value);</span>
+<span class="nc bnc" id="L722" title="All 2 branches missed.">            if (constant == null) {</span>
+<span class="nc" id="L723">                throw new IllegalArgumentException(value);</span>
+            } else {
+<span class="nc" id="L725">                return constant;</span>
+            }
+        }
+
+    }
+
+<span class="fc" id="L731">    public enum ModifiedAttackVector {</span>
+
+<span class="fc" id="L733">        @SerializedName(&quot;NETWORK&quot;)</span>
+        NETWORK(&quot;NETWORK&quot;),
+<span class="fc" id="L735">        @SerializedName(&quot;ADJACENT_NETWORK&quot;)</span>
+        ADJACENT_NETWORK(&quot;ADJACENT_NETWORK&quot;),
+<span class="fc" id="L737">        @SerializedName(&quot;LOCAL&quot;)</span>
+        LOCAL(&quot;LOCAL&quot;),
+<span class="fc" id="L739">        @SerializedName(&quot;PHYSICAL&quot;)</span>
+        PHYSICAL(&quot;PHYSICAL&quot;),
+<span class="fc" id="L741">        @SerializedName(&quot;NOT_DEFINED&quot;)</span>
+        NOT_DEFINED(&quot;NOT_DEFINED&quot;);
+        private final String value;
+<span class="fc" id="L744">        private final static Map&lt;String, CvssV30 .ModifiedAttackVector&gt; CONSTANTS = new HashMap&lt;String, CvssV30 .ModifiedAttackVector&gt;();</span>
+
+        static {
+<span class="fc bfc" id="L747" title="All 2 branches covered.">            for (CvssV30 .ModifiedAttackVector c: values()) {</span>
+<span class="fc" id="L748">                CONSTANTS.put(c.value, c);</span>
+            }
+<span class="fc" id="L750">        }</span>
+
+<span class="fc" id="L752">        private ModifiedAttackVector(String value) {</span>
+<span class="fc" id="L753">            this.value = value;</span>
+<span class="fc" id="L754">        }</span>
+
+        @Override
+        public String toString() {
+<span class="nc" id="L758">            return this.value;</span>
+        }
+
+        public String value() {
+<span class="nc" id="L762">            return this.value;</span>
+        }
+
+        public static CvssV30 .ModifiedAttackVector fromValue(String value) {
+<span class="nc" id="L766">            CvssV30 .ModifiedAttackVector constant = CONSTANTS.get(value);</span>
+<span class="nc bnc" id="L767" title="All 2 branches missed.">            if (constant == null) {</span>
+<span class="nc" id="L768">                throw new IllegalArgumentException(value);</span>
+            } else {
+<span class="nc" id="L770">                return constant;</span>
+            }
+        }
+
+    }
+
+<span class="fc" id="L776">    public enum ModifiedConfidentialityImpact {</span>
+
+<span class="fc" id="L778">        @SerializedName(&quot;NONE&quot;)</span>
+        NONE(&quot;NONE&quot;),
+<span class="fc" id="L780">        @SerializedName(&quot;LOW&quot;)</span>
+        LOW(&quot;LOW&quot;),
+<span class="fc" id="L782">        @SerializedName(&quot;HIGH&quot;)</span>
+        HIGH(&quot;HIGH&quot;),
+<span class="fc" id="L784">        @SerializedName(&quot;NOT_DEFINED&quot;)</span>
+        NOT_DEFINED(&quot;NOT_DEFINED&quot;);
+        private final String value;
+<span class="fc" id="L787">        private final static Map&lt;String, CvssV30 .ModifiedConfidentialityImpact&gt; CONSTANTS = new HashMap&lt;String, CvssV30 .ModifiedConfidentialityImpact&gt;();</span>
+
+        static {
+<span class="fc bfc" id="L790" title="All 2 branches covered.">            for (CvssV30 .ModifiedConfidentialityImpact c: values()) {</span>
+<span class="fc" id="L791">                CONSTANTS.put(c.value, c);</span>
+            }
+<span class="fc" id="L793">        }</span>
+
+<span class="fc" id="L795">        private ModifiedConfidentialityImpact(String value) {</span>
+<span class="fc" id="L796">            this.value = value;</span>
+<span class="fc" id="L797">        }</span>
+
+        @Override
+        public String toString() {
+<span class="nc" id="L801">            return this.value;</span>
+        }
+
+        public String value() {
+<span class="nc" id="L805">            return this.value;</span>
+        }
+
+        public static CvssV30 .ModifiedConfidentialityImpact fromValue(String value) {
+<span class="nc" id="L809">            CvssV30 .ModifiedConfidentialityImpact constant = CONSTANTS.get(value);</span>
+<span class="nc bnc" id="L810" title="All 2 branches missed.">            if (constant == null) {</span>
+<span class="nc" id="L811">                throw new IllegalArgumentException(value);</span>
+            } else {
+<span class="nc" id="L813">                return constant;</span>
+            }
+        }
+
+    }
+
+<span class="fc" id="L819">    public enum ModifiedPrivilegesRequired {</span>
+
+<span class="fc" id="L821">        @SerializedName(&quot;HIGH&quot;)</span>
+        HIGH(&quot;HIGH&quot;),
+<span class="fc" id="L823">        @SerializedName(&quot;LOW&quot;)</span>
+        LOW(&quot;LOW&quot;),
+<span class="fc" id="L825">        @SerializedName(&quot;NONE&quot;)</span>
+        NONE(&quot;NONE&quot;),
+<span class="fc" id="L827">        @SerializedName(&quot;NOT_DEFINED&quot;)</span>
+        NOT_DEFINED(&quot;NOT_DEFINED&quot;);
+        private final String value;
+<span class="fc" id="L830">        private final static Map&lt;String, CvssV30 .ModifiedPrivilegesRequired&gt; CONSTANTS = new HashMap&lt;String, CvssV30 .ModifiedPrivilegesRequired&gt;();</span>
+
+        static {
+<span class="fc bfc" id="L833" title="All 2 branches covered.">            for (CvssV30 .ModifiedPrivilegesRequired c: values()) {</span>
+<span class="fc" id="L834">                CONSTANTS.put(c.value, c);</span>
+            }
+<span class="fc" id="L836">        }</span>
+
+<span class="fc" id="L838">        private ModifiedPrivilegesRequired(String value) {</span>
+<span class="fc" id="L839">            this.value = value;</span>
+<span class="fc" id="L840">        }</span>
+
+        @Override
+        public String toString() {
+<span class="nc" id="L844">            return this.value;</span>
+        }
+
+        public String value() {
+<span class="nc" id="L848">            return this.value;</span>
+        }
+
+        public static CvssV30 .ModifiedPrivilegesRequired fromValue(String value) {
+<span class="nc" id="L852">            CvssV30 .ModifiedPrivilegesRequired constant = CONSTANTS.get(value);</span>
+<span class="nc bnc" id="L853" title="All 2 branches missed.">            if (constant == null) {</span>
+<span class="nc" id="L854">                throw new IllegalArgumentException(value);</span>
+            } else {
+<span class="nc" id="L856">                return constant;</span>
+            }
+        }
+
+    }
+
+<span class="fc" id="L862">    public enum ModifiedScope {</span>
+
+<span class="fc" id="L864">        @SerializedName(&quot;UNCHANGED&quot;)</span>
+        UNCHANGED(&quot;UNCHANGED&quot;),
+<span class="fc" id="L866">        @SerializedName(&quot;CHANGED&quot;)</span>
+        CHANGED(&quot;CHANGED&quot;),
+<span class="fc" id="L868">        @SerializedName(&quot;NOT_DEFINED&quot;)</span>
+        NOT_DEFINED(&quot;NOT_DEFINED&quot;);
+        private final String value;
+<span class="fc" id="L871">        private final static Map&lt;String, CvssV30 .ModifiedScope&gt; CONSTANTS = new HashMap&lt;String, CvssV30 .ModifiedScope&gt;();</span>
+
+        static {
+<span class="fc bfc" id="L874" title="All 2 branches covered.">            for (CvssV30 .ModifiedScope c: values()) {</span>
+<span class="fc" id="L875">                CONSTANTS.put(c.value, c);</span>
+            }
+<span class="fc" id="L877">        }</span>
+
+<span class="fc" id="L879">        private ModifiedScope(String value) {</span>
+<span class="fc" id="L880">            this.value = value;</span>
+<span class="fc" id="L881">        }</span>
+
+        @Override
+        public String toString() {
+<span class="nc" id="L885">            return this.value;</span>
+        }
+
+        public String value() {
+<span class="nc" id="L889">            return this.value;</span>
+        }
+
+        public static CvssV30 .ModifiedScope fromValue(String value) {
+<span class="nc" id="L893">            CvssV30 .ModifiedScope constant = CONSTANTS.get(value);</span>
+<span class="nc bnc" id="L894" title="All 2 branches missed.">            if (constant == null) {</span>
+<span class="nc" id="L895">                throw new IllegalArgumentException(value);</span>
+            } else {
+<span class="nc" id="L897">                return constant;</span>
+            }
+        }
+
+    }
+
+<span class="fc" id="L903">    public enum ModifiedUserInteraction {</span>
+
+<span class="fc" id="L905">        @SerializedName(&quot;NONE&quot;)</span>
+        NONE(&quot;NONE&quot;),
+<span class="fc" id="L907">        @SerializedName(&quot;REQUIRED&quot;)</span>
+        REQUIRED(&quot;REQUIRED&quot;),
+<span class="fc" id="L909">        @SerializedName(&quot;NOT_DEFINED&quot;)</span>
+        NOT_DEFINED(&quot;NOT_DEFINED&quot;);
+        private final String value;
+<span class="fc" id="L912">        private final static Map&lt;String, CvssV30 .ModifiedUserInteraction&gt; CONSTANTS = new HashMap&lt;String, CvssV30 .ModifiedUserInteraction&gt;();</span>
+
+        static {
+<span class="fc bfc" id="L915" title="All 2 branches covered.">            for (CvssV30 .ModifiedUserInteraction c: values()) {</span>
+<span class="fc" id="L916">                CONSTANTS.put(c.value, c);</span>
+            }
+<span class="fc" id="L918">        }</span>
+
+<span class="fc" id="L920">        private ModifiedUserInteraction(String value) {</span>
+<span class="fc" id="L921">            this.value = value;</span>
+<span class="fc" id="L922">        }</span>
+
+        @Override
+        public String toString() {
+<span class="nc" id="L926">            return this.value;</span>
+        }
+
+        public String value() {
+<span class="nc" id="L930">            return this.value;</span>
+        }
+
+        public static CvssV30 .ModifiedUserInteraction fromValue(String value) {
+<span class="nc" id="L934">            CvssV30 .ModifiedUserInteraction constant = CONSTANTS.get(value);</span>
+<span class="nc bnc" id="L935" title="All 2 branches missed.">            if (constant == null) {</span>
+<span class="nc" id="L936">                throw new IllegalArgumentException(value);</span>
+            } else {
+<span class="nc" id="L938">                return constant;</span>
+            }
+        }
+
+    }
+
+<span class="fc" id="L944">    public enum PrivilegesRequired {</span>
+
+<span class="fc" id="L946">        @SerializedName(&quot;HIGH&quot;)</span>
+        HIGH(&quot;HIGH&quot;),
+<span class="fc" id="L948">        @SerializedName(&quot;LOW&quot;)</span>
+        LOW(&quot;LOW&quot;),
+<span class="fc" id="L950">        @SerializedName(&quot;NONE&quot;)</span>
+        NONE(&quot;NONE&quot;);
+        private final String value;
+<span class="fc" id="L953">        private final static Map&lt;String, CvssV30 .PrivilegesRequired&gt; CONSTANTS = new HashMap&lt;String, CvssV30 .PrivilegesRequired&gt;();</span>
+
+        static {
+<span class="fc bfc" id="L956" title="All 2 branches covered.">            for (CvssV30 .PrivilegesRequired c: values()) {</span>
+<span class="fc" id="L957">                CONSTANTS.put(c.value, c);</span>
+            }
+<span class="fc" id="L959">        }</span>
+
+<span class="fc" id="L961">        private PrivilegesRequired(String value) {</span>
+<span class="fc" id="L962">            this.value = value;</span>
+<span class="fc" id="L963">        }</span>
+
+        @Override
+        public String toString() {
+<span class="nc" id="L967">            return this.value;</span>
+        }
+
+        public String value() {
+<span class="fc" id="L971">            return this.value;</span>
+        }
+
+        public static CvssV30 .PrivilegesRequired fromValue(String value) {
+<span class="nc" id="L975">            CvssV30 .PrivilegesRequired constant = CONSTANTS.get(value);</span>
+<span class="nc bnc" id="L976" title="All 2 branches missed.">            if (constant == null) {</span>
+<span class="nc" id="L977">                throw new IllegalArgumentException(value);</span>
+            } else {
+<span class="nc" id="L979">                return constant;</span>
+            }
+        }
+
+    }
+
+<span class="fc" id="L985">    public enum RemediationLevel {</span>
+
+<span class="fc" id="L987">        @SerializedName(&quot;OFFICIAL_FIX&quot;)</span>
+        OFFICIAL_FIX(&quot;OFFICIAL_FIX&quot;),
+<span class="fc" id="L989">        @SerializedName(&quot;TEMPORARY_FIX&quot;)</span>
+        TEMPORARY_FIX(&quot;TEMPORARY_FIX&quot;),
+<span class="fc" id="L991">        @SerializedName(&quot;WORKAROUND&quot;)</span>
+        WORKAROUND(&quot;WORKAROUND&quot;),
+<span class="fc" id="L993">        @SerializedName(&quot;UNAVAILABLE&quot;)</span>
+        UNAVAILABLE(&quot;UNAVAILABLE&quot;),
+<span class="fc" id="L995">        @SerializedName(&quot;NOT_DEFINED&quot;)</span>
+        NOT_DEFINED(&quot;NOT_DEFINED&quot;);
+        private final String value;
+<span class="fc" id="L998">        private final static Map&lt;String, CvssV30 .RemediationLevel&gt; CONSTANTS = new HashMap&lt;String, CvssV30 .RemediationLevel&gt;();</span>
+
+        static {
+<span class="fc bfc" id="L1001" title="All 2 branches covered.">            for (CvssV30 .RemediationLevel c: values()) {</span>
+<span class="fc" id="L1002">                CONSTANTS.put(c.value, c);</span>
+            }
+<span class="fc" id="L1004">        }</span>
+
+<span class="fc" id="L1006">        private RemediationLevel(String value) {</span>
+<span class="fc" id="L1007">            this.value = value;</span>
+<span class="fc" id="L1008">        }</span>
+
+        @Override
+        public String toString() {
+<span class="nc" id="L1012">            return this.value;</span>
+        }
+
+        public String value() {
+<span class="nc" id="L1016">            return this.value;</span>
+        }
+
+        public static CvssV30 .RemediationLevel fromValue(String value) {
+<span class="nc" id="L1020">            CvssV30 .RemediationLevel constant = CONSTANTS.get(value);</span>
+<span class="nc bnc" id="L1021" title="All 2 branches missed.">            if (constant == null) {</span>
+<span class="nc" id="L1022">                throw new IllegalArgumentException(value);</span>
+            } else {
+<span class="nc" id="L1024">                return constant;</span>
+            }
+        }
+
+    }
+
+<span class="fc" id="L1030">    public enum ReportConfidence {</span>
+
+<span class="fc" id="L1032">        @SerializedName(&quot;UNKNOWN&quot;)</span>
+        UNKNOWN(&quot;UNKNOWN&quot;),
+<span class="fc" id="L1034">        @SerializedName(&quot;REASONABLE&quot;)</span>
+        REASONABLE(&quot;REASONABLE&quot;),
+<span class="fc" id="L1036">        @SerializedName(&quot;CONFIRMED&quot;)</span>
+        CONFIRMED(&quot;CONFIRMED&quot;),
+<span class="fc" id="L1038">        @SerializedName(&quot;NOT_DEFINED&quot;)</span>
+        NOT_DEFINED(&quot;NOT_DEFINED&quot;);
+        private final String value;
+<span class="fc" id="L1041">        private final static Map&lt;String, CvssV30 .ReportConfidence&gt; CONSTANTS = new HashMap&lt;String, CvssV30 .ReportConfidence&gt;();</span>
+
+        static {
+<span class="fc bfc" id="L1044" title="All 2 branches covered.">            for (CvssV30 .ReportConfidence c: values()) {</span>
+<span class="fc" id="L1045">                CONSTANTS.put(c.value, c);</span>
+            }
+<span class="fc" id="L1047">        }</span>
+
+<span class="fc" id="L1049">        private ReportConfidence(String value) {</span>
+<span class="fc" id="L1050">            this.value = value;</span>
+<span class="fc" id="L1051">        }</span>
+
+        @Override
+        public String toString() {
+<span class="nc" id="L1055">            return this.value;</span>
+        }
+
+        public String value() {
+<span class="nc" id="L1059">            return this.value;</span>
+        }
+
+        public static CvssV30 .ReportConfidence fromValue(String value) {
+<span class="nc" id="L1063">            CvssV30 .ReportConfidence constant = CONSTANTS.get(value);</span>
+<span class="nc bnc" id="L1064" title="All 2 branches missed.">            if (constant == null) {</span>
+<span class="nc" id="L1065">                throw new IllegalArgumentException(value);</span>
+            } else {
+<span class="nc" id="L1067">                return constant;</span>
+            }
+        }
+
+    }
+
+<span class="fc" id="L1073">    public enum Scope {</span>
+
+<span class="fc" id="L1075">        @SerializedName(&quot;UNCHANGED&quot;)</span>
+        UNCHANGED(&quot;UNCHANGED&quot;),
+<span class="fc" id="L1077">        @SerializedName(&quot;CHANGED&quot;)</span>
+        CHANGED(&quot;CHANGED&quot;);
+        private final String value;
+<span class="fc" id="L1080">        private final static Map&lt;String, CvssV30 .Scope&gt; CONSTANTS = new HashMap&lt;String, CvssV30 .Scope&gt;();</span>
+
+        static {
+<span class="fc bfc" id="L1083" title="All 2 branches covered.">            for (CvssV30 .Scope c: values()) {</span>
+<span class="fc" id="L1084">                CONSTANTS.put(c.value, c);</span>
+            }
+<span class="fc" id="L1086">        }</span>
+
+<span class="fc" id="L1088">        private Scope(String value) {</span>
+<span class="fc" id="L1089">            this.value = value;</span>
+<span class="fc" id="L1090">        }</span>
+
+        @Override
+        public String toString() {
+<span class="nc" id="L1094">            return this.value;</span>
+        }
+
+        public String value() {
+<span class="fc" id="L1098">            return this.value;</span>
+        }
+
+        public static CvssV30 .Scope fromValue(String value) {
+<span class="nc" id="L1102">            CvssV30 .Scope constant = CONSTANTS.get(value);</span>
+<span class="nc bnc" id="L1103" title="All 2 branches missed.">            if (constant == null) {</span>
+<span class="nc" id="L1104">                throw new IllegalArgumentException(value);</span>
+            } else {
+<span class="nc" id="L1106">                return constant;</span>
+            }
+        }
+
+    }
+
+<span class="fc" id="L1112">    public enum UserInteraction {</span>
+
+<span class="fc" id="L1114">        @SerializedName(&quot;NONE&quot;)</span>
+        NONE(&quot;NONE&quot;),
+<span class="fc" id="L1116">        @SerializedName(&quot;REQUIRED&quot;)</span>
+        REQUIRED(&quot;REQUIRED&quot;);
+        private final String value;
+<span class="fc" id="L1119">        private final static Map&lt;String, CvssV30 .UserInteraction&gt; CONSTANTS = new HashMap&lt;String, CvssV30 .UserInteraction&gt;();</span>
+
+        static {
+<span class="fc bfc" id="L1122" title="All 2 branches covered.">            for (CvssV30 .UserInteraction c: values()) {</span>
+<span class="fc" id="L1123">                CONSTANTS.put(c.value, c);</span>
+            }
+<span class="fc" id="L1125">        }</span>
+
+<span class="fc" id="L1127">        private UserInteraction(String value) {</span>
+<span class="fc" id="L1128">            this.value = value;</span>
+<span class="fc" id="L1129">        }</span>
+
+        @Override
+        public String toString() {
+<span class="nc" id="L1133">            return this.value;</span>
+        }
+
+        public String value() {
+<span class="fc" id="L1137">            return this.value;</span>
+        }
+
+        public static CvssV30 .UserInteraction fromValue(String value) {
+<span class="nc" id="L1141">            CvssV30 .UserInteraction constant = CONSTANTS.get(value);</span>
+<span class="nc bnc" id="L1142" title="All 2 branches missed.">            if (constant == null) {</span>
+<span class="nc" id="L1143">                throw new IllegalArgumentException(value);</span>
+            } else {
+<span class="nc" id="L1145">                return constant;</span>
+            }
+        }
+
+    }
+
+<span class="fc" id="L1151">    public enum Version {</span>
+
+<span class="fc" id="L1153">        @SerializedName(&quot;3.0&quot;)</span>
+        _3_0(&quot;3.0&quot;);
+        private final String value;
+<span class="fc" id="L1156">        private final static Map&lt;String, CvssV30 .Version&gt; CONSTANTS = new HashMap&lt;String, CvssV30 .Version&gt;();</span>
+
+        static {
+<span class="fc bfc" id="L1159" title="All 2 branches covered.">            for (CvssV30 .Version c: values()) {</span>
+<span class="fc" id="L1160">                CONSTANTS.put(c.value, c);</span>
+            }
+<span class="fc" id="L1162">        }</span>
+
+<span class="fc" id="L1164">        private Version(String value) {</span>
+<span class="fc" id="L1165">            this.value = value;</span>
+<span class="fc" id="L1166">        }</span>
+
+        @Override
+        public String toString() {
+<span class="nc" id="L1170">            return this.value;</span>
+        }
+
+        public String value() {
+<span class="nc" id="L1174">            return this.value;</span>
+        }
+
+        public static CvssV30 .Version fromValue(String value) {
+<span class="nc" id="L1178">            CvssV30 .Version constant = CONSTANTS.get(value);</span>
+<span class="nc bnc" id="L1179" title="All 2 branches missed.">            if (constant == null) {</span>
+<span class="nc" id="L1180">                throw new IllegalArgumentException(value);</span>
+            } else {
+<span class="nc" id="L1182">                return constant;</span>
+            }
+        }
+
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.2.201808211720</span></div></body></html>

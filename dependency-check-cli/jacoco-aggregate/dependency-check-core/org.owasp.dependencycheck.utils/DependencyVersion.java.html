@@ -1,0 +1,273 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../jacoco-resources/report.gif" type="image/gif"/><title>DependencyVersion.java</title><link rel="stylesheet" href="../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../index.html" class="el_report">Dependency-Check Command Line</a> &gt; <a href="../index.html" class="el_bundle">dependency-check-core</a> &gt; <a href="index.source.html" class="el_package">org.owasp.dependencycheck.utils</a> &gt; <span class="el_source">DependencyVersion.java</span></div><h1>DependencyVersion.java</h1><pre class="source lang-java linenums">/*
+ * This file is part of dependency-check-core.
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ * Copyright (c) 2013 Jeremy Long. All Rights Reserved.
+ */
+package org.owasp.dependencycheck.utils;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import javax.annotation.concurrent.NotThreadSafe;
+import org.apache.commons.lang3.StringUtils;
+
+/**
+ * &lt;p&gt;
+ * Simple object to track the parts of a version number. The parts are contained
+ * in a List such that version 1.2.3 will be stored as:  &lt;code&gt;versionParts[0] = 1;
+ * versionParts[1] = 2;
+ * versionParts[2] = 3;
+ * &lt;/code&gt;&lt;/p&gt;
+ * &lt;p&gt;
+ * Note, the parser contained in this class expects the version numbers to be
+ * separated by periods. If a different separator is used the parser will likely
+ * fail.&lt;/p&gt;
+ *
+ * @author Jeremy Long
+ */
+@NotThreadSafe
+public class DependencyVersion implements Iterable&lt;String&gt;, Comparable&lt;DependencyVersion&gt; {
+
+    /**
+     * A list of the version parts.
+     */
+    private List&lt;String&gt; versionParts;
+
+    /**
+     * Constructor for a empty DependencyVersion.
+     */
+<span class="fc" id="L53">    public DependencyVersion() {</span>
+<span class="fc" id="L54">    }</span>
+
+    /**
+     * Constructor for a DependencyVersion that will parse a version string.
+     * &lt;b&gt;Note&lt;/b&gt;, this should only be used when the version passed in is
+     * already known to be a well formatted version number. Otherwise,
+     * DependencyVersionUtil.parseVersion() should be used instead.
+     *
+     * @param version the well formatted version number to parse
+     */
+<span class="fc" id="L64">    public DependencyVersion(String version) {</span>
+<span class="fc" id="L65">        parseVersion(version);</span>
+<span class="fc" id="L66">    }</span>
+
+    /**
+     * Parses a version string into its sub parts: major, minor, revision,
+     * build, etc. &lt;b&gt;Note&lt;/b&gt;, this should only be used to parse something that
+     * is already known to be a version number.
+     *
+     * @param version the version string to parse
+     */
+    public final void parseVersion(String version) {
+<span class="fc" id="L76">        versionParts = new ArrayList&lt;&gt;();</span>
+<span class="fc bfc" id="L77" title="All 2 branches covered.">        if (version != null) {</span>
+<span class="fc" id="L78">            final Pattern rx = Pattern.compile(&quot;(\\d+[a-z]{1,3}$|[a-z]+\\d+|\\d+|(release|beta|alpha)$)&quot;);</span>
+<span class="fc" id="L79">            final Matcher matcher = rx.matcher(version.toLowerCase());</span>
+<span class="fc bfc" id="L80" title="All 2 branches covered.">            while (matcher.find()) {</span>
+<span class="fc" id="L81">                versionParts.add(matcher.group());</span>
+            }
+<span class="fc bfc" id="L83" title="All 2 branches covered.">            if (versionParts.isEmpty()) {</span>
+<span class="fc" id="L84">                versionParts.add(version);</span>
+            }
+        }
+<span class="fc" id="L87">    }</span>
+
+    /**
+     * Get the value of versionParts.
+     *
+     * @return the value of versionParts
+     */
+    public List&lt;String&gt; getVersionParts() {
+<span class="fc" id="L95">        return versionParts;</span>
+    }
+
+    /**
+     * Set the value of versionParts.
+     *
+     * @param versionParts new value of versionParts
+     */
+    public void setVersionParts(List&lt;String&gt; versionParts) {
+<span class="fc" id="L104">        this.versionParts = versionParts;</span>
+<span class="fc" id="L105">    }</span>
+
+    /**
+     * Retrieves an iterator for the version parts.
+     *
+     * @return an iterator for the version parts
+     */
+    @Override
+    public Iterator&lt;String&gt; iterator() {
+<span class="nc" id="L114">        return versionParts.iterator();</span>
+    }
+
+    /**
+     * Reconstructs the version string from the split version parts.
+     *
+     * @return a string representing the version.
+     */
+    @Override
+    public String toString() {
+<span class="fc" id="L124">        return StringUtils.join(versionParts, '.');</span>
+    }
+
+    /**
+     * Compares the equality of this object to the one passed in as a parameter.
+     *
+     * @param obj the object to compare equality
+     * @return returns true only if the two objects are equal, otherwise false
+     */
+    @Override
+    public boolean equals(Object obj) {
+<span class="fc bfc" id="L135" title="All 2 branches covered.">        if (obj == null) {</span>
+<span class="fc" id="L136">            return false;</span>
+        }
+<span class="pc bpc" id="L138" title="1 of 2 branches missed.">        if (!(obj instanceof DependencyVersion)) {</span>
+<span class="nc" id="L139">            return false;</span>
+        }
+<span class="fc" id="L141">        final DependencyVersion other = (DependencyVersion) obj;</span>
+<span class="fc bfc" id="L142" title="All 2 branches covered.">        final int minVersionMatchLength = (this.versionParts.size() &lt; other.versionParts.size())</span>
+<span class="fc" id="L143">                ? this.versionParts.size() : other.versionParts.size();</span>
+<span class="fc bfc" id="L144" title="All 2 branches covered.">        final int maxVersionMatchLength = (this.versionParts.size() &gt; other.versionParts.size())</span>
+<span class="fc" id="L145">                ? this.versionParts.size() : other.versionParts.size();</span>
+
+<span class="fc bfc" id="L147" title="All 4 branches covered.">        if (minVersionMatchLength == 1 &amp;&amp; maxVersionMatchLength &gt;= 3) {</span>
+<span class="fc" id="L148">            return false;</span>
+        }
+
+        //TODO steal better version of code from compareTo
+<span class="fc bfc" id="L152" title="All 2 branches covered.">        for (int i = 0; i &lt; minVersionMatchLength; i++) {</span>
+<span class="fc" id="L153">            final String thisPart = this.versionParts.get(i);</span>
+<span class="fc" id="L154">            final String otherPart = other.versionParts.get(i);</span>
+<span class="fc bfc" id="L155" title="All 2 branches covered.">            if (!thisPart.equals(otherPart)) {</span>
+<span class="fc" id="L156">                return false;</span>
+            }
+        }
+<span class="fc bfc" id="L159" title="All 2 branches covered.">        if (this.versionParts.size() &gt; minVersionMatchLength) {</span>
+<span class="pc bpc" id="L160" title="1 of 2 branches missed.">            for (int i = minVersionMatchLength; i &lt; this.versionParts.size(); i++) {</span>
+<span class="pc bpc" id="L161" title="1 of 2 branches missed.">                if (!&quot;0&quot;.equals(this.versionParts.get(i))) {</span>
+<span class="fc" id="L162">                    return false;</span>
+                }
+            }
+        }
+
+<span class="fc bfc" id="L167" title="All 2 branches covered.">        if (other.versionParts.size() &gt; minVersionMatchLength) {</span>
+<span class="pc bpc" id="L168" title="1 of 2 branches missed.">            for (int i = minVersionMatchLength; i &lt; other.versionParts.size(); i++) {</span>
+<span class="pc bpc" id="L169" title="1 of 2 branches missed.">                if (!&quot;0&quot;.equals(other.versionParts.get(i))) {</span>
+<span class="fc" id="L170">                    return false;</span>
+                }
+            }
+        }
+
+        /*
+         *  if (this.versionParts != other.versionParts &amp;&amp; (this.versionParts == null || !this.versionParts.equals(other.versionParts))) {
+         *      return false;
+         *  }
+         */
+<span class="fc" id="L180">        return true;</span>
+    }
+
+    /**
+     * Calculates the hashCode for this object.
+     *
+     * @return the hashCode
+     */
+    @Override
+    public int hashCode() {
+<span class="nc" id="L190">        int hash = 5;</span>
+<span class="nc bnc" id="L191" title="All 2 branches missed.">        hash = 71 * hash + (this.versionParts != null ? this.versionParts.hashCode() : 0);</span>
+<span class="nc" id="L192">        return hash;</span>
+    }
+
+    /**
+     * Determines if the three most major major version parts are identical. For
+     * instances, if version 1.2.3.4 was compared to 1.2.3 this function would
+     * return true.
+     *
+     * @param version the version number to compare
+     * @return true if the first three major parts of the version are identical
+     */
+    public boolean matchesAtLeastThreeLevels(DependencyVersion version) {
+<span class="pc bpc" id="L204" title="1 of 2 branches missed.">        if (version == null) {</span>
+<span class="nc" id="L205">            return false;</span>
+        }
+<span class="fc bfc" id="L207" title="All 2 branches covered.">        if (Math.abs(this.versionParts.size() - version.versionParts.size()) &gt;= 3) {</span>
+<span class="fc" id="L208">            return false;</span>
+        }
+
+<span class="fc bfc" id="L211" title="All 2 branches covered.">        final int max = (this.versionParts.size() &lt; version.versionParts.size())</span>
+<span class="fc" id="L212">                ? this.versionParts.size() : version.versionParts.size();</span>
+
+<span class="fc" id="L214">        boolean ret = true;</span>
+<span class="fc bfc" id="L215" title="All 2 branches covered.">        for (int i = 0; i &lt; max; i++) {</span>
+<span class="fc" id="L216">            final String thisVersion = this.versionParts.get(i);</span>
+<span class="fc" id="L217">            final String otherVersion = version.getVersionParts().get(i);</span>
+<span class="pc bpc" id="L218" title="1 of 2 branches missed.">            if (i &gt;= 3) {</span>
+<span class="nc bnc" id="L219" title="All 2 branches missed.">                if (thisVersion.compareToIgnoreCase(otherVersion) &gt;= 0) {</span>
+<span class="nc" id="L220">                    ret = false;</span>
+<span class="nc" id="L221">                    break;</span>
+                }
+<span class="fc bfc" id="L223" title="All 2 branches covered.">            } else if (!thisVersion.equals(otherVersion)) {</span>
+<span class="fc" id="L224">                ret = false;</span>
+<span class="fc" id="L225">                break;</span>
+            }
+        }
+
+<span class="fc" id="L229">        return ret;</span>
+    }
+
+    @Override
+    public int compareTo(DependencyVersion version) {
+<span class="pc bpc" id="L234" title="1 of 2 branches missed.">        if (version == null) {</span>
+<span class="nc" id="L235">            return 1;</span>
+        }
+<span class="fc" id="L237">        final List&lt;String&gt; left = this.getVersionParts();</span>
+<span class="fc" id="L238">        final List&lt;String&gt; right = version.getVersionParts();</span>
+<span class="fc bfc" id="L239" title="All 2 branches covered.">        final int max = left.size() &lt; right.size() ? left.size() : right.size();</span>
+
+<span class="fc bfc" id="L241" title="All 2 branches covered.">        for (int i = 0; i &lt; max; i++) {</span>
+<span class="fc" id="L242">            final String lStr = left.get(i);</span>
+<span class="fc" id="L243">            final String rStr = right.get(i);</span>
+<span class="fc bfc" id="L244" title="All 2 branches covered.">            if (lStr.equals(rStr)) {</span>
+<span class="fc" id="L245">                continue;</span>
+            }
+            try {
+<span class="fc" id="L248">                final int l = Integer.parseInt(lStr);</span>
+<span class="fc" id="L249">                final int r = Integer.parseInt(rStr);</span>
+<span class="fc bfc" id="L250" title="All 2 branches covered.">                if (l &lt; r) {</span>
+<span class="fc" id="L251">                    return -1;</span>
+<span class="pc bpc" id="L252" title="1 of 2 branches missed.">                } else if (l &gt; r) {</span>
+<span class="fc" id="L253">                    return 1;</span>
+                }
+<span class="fc" id="L255">            } catch (NumberFormatException ex) {</span>
+<span class="fc" id="L256">                final int comp = left.get(i).compareTo(right.get(i));</span>
+<span class="fc bfc" id="L257" title="All 2 branches covered.">                if (comp &lt; 0) {</span>
+<span class="fc" id="L258">                    return -1;</span>
+<span class="pc bpc" id="L259" title="1 of 2 branches missed.">                } else if (comp &gt; 0) {</span>
+<span class="fc" id="L260">                    return 1;</span>
+                }
+<span class="nc" id="L262">            }</span>
+        }
+<span class="fc bfc" id="L264" title="All 2 branches covered.">        if (left.size() &lt; right.size()) {</span>
+<span class="fc" id="L265">            return -1;</span>
+<span class="pc bpc" id="L266" title="1 of 2 branches missed.">        } else if (left.size() &gt; right.size()) {</span>
+<span class="nc" id="L267">            return 1;</span>
+        } else {
+<span class="fc" id="L269">            return 0;</span>
+        }
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.2.201808211720</span></div></body></html>

@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../jacoco-resources/report.gif" type="image/gif"/><title>CVEDataMeta.java</title><link rel="stylesheet" href="../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../index.html" class="el_report">Dependency-Check Build-Reporting</a> &gt; <a href="../index.html" class="el_bundle">dependency-check-core</a> &gt; <a href="index.source.html" class="el_package">org.owasp.dependencycheck.data.nvd.json</a> &gt; <span class="el_source">CVEDataMeta.java</span></div><h1>CVEDataMeta.java</h1><pre class="source lang-java linenums">
+package org.owasp.dependencycheck.data.nvd.json;
+
+import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+
+<span class="fc" id="L10">public class CVEDataMeta {</span>
+
+    /**
+     * 
+     * (Required)
+     * 
+     */
+    @SerializedName(&quot;ID&quot;)
+    @Expose
+    private String iD;
+    /**
+     * 
+     * (Required)
+     * 
+     */
+    @SerializedName(&quot;ASSIGNER&quot;)
+    @Expose
+    private String aSSIGNER;
+    @SerializedName(&quot;STATE&quot;)
+    @Expose
+    private String sTATE;
+
+    /**
+     * 
+     * (Required)
+     * 
+     */
+    public String getID() {
+<span class="fc" id="L38">        return iD;</span>
+    }
+
+    /**
+     * 
+     * (Required)
+     * 
+     */
+    public void setID(String iD) {
+<span class="nc" id="L47">        this.iD = iD;</span>
+<span class="nc" id="L48">    }</span>
+
+    /**
+     * 
+     * (Required)
+     * 
+     */
+    public String getASSIGNER() {
+<span class="nc" id="L56">        return aSSIGNER;</span>
+    }
+
+    /**
+     * 
+     * (Required)
+     * 
+     */
+    public void setASSIGNER(String aSSIGNER) {
+<span class="nc" id="L65">        this.aSSIGNER = aSSIGNER;</span>
+<span class="nc" id="L66">    }</span>
+
+    public String getSTATE() {
+<span class="nc" id="L69">        return sTATE;</span>
+    }
+
+    public void setSTATE(String sTATE) {
+<span class="nc" id="L73">        this.sTATE = sTATE;</span>
+<span class="nc" id="L74">    }</span>
+
+    @Override
+    public String toString() {
+<span class="nc" id="L78">        return new ToStringBuilder(this).append(&quot;iD&quot;, iD).append(&quot;aSSIGNER&quot;, aSSIGNER).append(&quot;sTATE&quot;, sTATE).toString();</span>
+    }
+
+    @Override
+    public int hashCode() {
+<span class="nc" id="L83">        return new HashCodeBuilder().append(sTATE).append(iD).append(aSSIGNER).toHashCode();</span>
+    }
+
+    @Override
+    public boolean equals(Object other) {
+<span class="nc bnc" id="L88" title="All 2 branches missed.">        if (other == this) {</span>
+<span class="nc" id="L89">            return true;</span>
+        }
+<span class="nc bnc" id="L91" title="All 2 branches missed.">        if ((other instanceof CVEDataMeta) == false) {</span>
+<span class="nc" id="L92">            return false;</span>
+        }
+<span class="nc" id="L94">        CVEDataMeta rhs = ((CVEDataMeta) other);</span>
+<span class="nc" id="L95">        return new EqualsBuilder().append(sTATE, rhs.sTATE).append(iD, rhs.iD).append(aSSIGNER, rhs.aSSIGNER).isEquals();</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.2.201808211720</span></div></body></html>

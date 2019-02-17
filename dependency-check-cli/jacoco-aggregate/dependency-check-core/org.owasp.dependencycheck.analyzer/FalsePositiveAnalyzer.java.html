@@ -1,0 +1,503 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../jacoco-resources/report.gif" type="image/gif"/><title>FalsePositiveAnalyzer.java</title><link rel="stylesheet" href="../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../index.html" class="el_report">Dependency-Check Command Line</a> &gt; <a href="../index.html" class="el_bundle">dependency-check-core</a> &gt; <a href="index.source.html" class="el_package">org.owasp.dependencycheck.analyzer</a> &gt; <span class="el_source">FalsePositiveAnalyzer.java</span></div><h1>FalsePositiveAnalyzer.java</h1><pre class="source lang-java linenums">/*
+ * This file is part of dependency-check-core.
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ * Copyright (c) 2012 Jeremy Long. All Rights Reserved.
+ */
+package org.owasp.dependencycheck.analyzer;
+
+import java.io.FileFilter;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.ListIterator;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import javax.annotation.concurrent.ThreadSafe;
+import org.owasp.dependencycheck.Engine;
+import org.owasp.dependencycheck.analyzer.exception.AnalysisException;
+import org.owasp.dependencycheck.dependency.Dependency;
+import org.owasp.dependencycheck.dependency.Evidence;
+import org.owasp.dependencycheck.dependency.EvidenceType;
+import org.owasp.dependencycheck.dependency.naming.CpeIdentifier;
+import org.owasp.dependencycheck.dependency.naming.Identifier;
+import org.owasp.dependencycheck.utils.FileFilterBuilder;
+import org.owasp.dependencycheck.utils.Settings;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import us.springett.parsers.cpe.Cpe;
+import us.springett.parsers.cpe.CpeBuilder;
+import us.springett.parsers.cpe.exceptions.CpeValidationException;
+import us.springett.parsers.cpe.values.Part;
+
+/**
+ * This analyzer attempts to remove some well known false positives -
+ * specifically regarding the java runtime.
+ *
+ * @author Jeremy Long
+ */
+@ThreadSafe
+<span class="fc" id="L53">public class FalsePositiveAnalyzer extends AbstractAnalyzer {</span>
+
+    /**
+     * The Logger.
+     */
+<span class="fc" id="L58">    private static final Logger LOGGER = LoggerFactory.getLogger(FalsePositiveAnalyzer.class);</span>
+    /**
+     * The file filter used to find DLL and EXE.
+     */
+<span class="fc" id="L62">    private static final FileFilter DLL_EXE_FILTER = FileFilterBuilder.newInstance().addExtensions(&quot;dll&quot;, &quot;exe&quot;).build();</span>
+    /**
+     * Regex to identify core java libraries and a few other commonly
+     * misidentified ones.
+     */
+<span class="fc" id="L67">    public static final Pattern CORE_JAVA = Pattern.compile(&quot;^cpe:/a:(sun|oracle|ibm):(j2[ems]e|&quot;</span>
+            + &quot;java(_platform_micro_edition|_runtime_environment|_se|virtual_machine|se_development_kit|fx)?|&quot;
+            + &quot;jdk|jre|jsse)($|:.*)&quot;);
+    /**
+     * Regex to identify core jsf libraries.
+     */
+<span class="fc" id="L73">    public static final Pattern CORE_JAVA_JSF = Pattern.compile(&quot;^cpe:/a:(sun|oracle|ibm):jsf($|:.*)&quot;);</span>
+    /**
+     * Regex to identify core java library files. This is currently incomplete.
+     */
+<span class="fc" id="L77">    public static final Pattern CORE_FILES = Pattern.compile(&quot;(^|/)((alt[-])?rt|jsse|jfxrt|jfr|jce|javaws|deploy|charsets)\\.jar$&quot;);</span>
+    /**
+     * Regex to identify core jsf java library files. This is currently
+     * incomplete.
+     */
+<span class="fc" id="L82">    public static final Pattern CORE_JSF_FILES = Pattern.compile(&quot;(^|/)jsf[-][^/]*\\.jar$&quot;);</span>
+
+    //&lt;editor-fold defaultstate=&quot;collapsed&quot; desc=&quot;All standard implementation details of Analyzer&quot;&gt;
+    /**
+     * The name of the analyzer.
+     */
+    private static final String ANALYZER_NAME = &quot;False Positive Analyzer&quot;;
+    /**
+     * The phase that this analyzer is intended to run in.
+     */
+<span class="fc" id="L92">    private static final AnalysisPhase ANALYSIS_PHASE = AnalysisPhase.POST_IDENTIFIER_ANALYSIS;</span>
+
+    /**
+     * Returns the name of the analyzer.
+     *
+     * @return the name of the analyzer.
+     */
+    @Override
+    public String getName() {
+<span class="fc" id="L101">        return ANALYZER_NAME;</span>
+    }
+
+    /**
+     * Returns the phase that the analyzer is intended to run in.
+     *
+     * @return the phase that the analyzer is intended to run in.
+     */
+    @Override
+    public AnalysisPhase getAnalysisPhase() {
+<span class="fc" id="L111">        return ANALYSIS_PHASE;</span>
+    }
+
+    /**
+     * &lt;p&gt;
+     * Returns the setting key to determine if the analyzer is enabled.&lt;/p&gt;
+     *
+     * @return the key for the analyzer's enabled property
+     */
+    @Override
+    protected String getAnalyzerEnabledSettingKey() {
+<span class="fc" id="L122">        return Settings.KEYS.ANALYZER_FALSE_POSITIVE_ENABLED;</span>
+    }
+    //&lt;/editor-fold&gt;
+
+    /**
+     * Analyzes the dependencies and removes bad/incorrect CPE associations
+     * based on various heuristics.
+     *
+     * @param dependency the dependency to analyze.
+     * @param engine the engine that is scanning the dependencies
+     * @throws AnalysisException is thrown if there is an error reading the JAR
+     * file.
+     */
+    @Override
+    protected void analyzeDependency(Dependency dependency, Engine engine) throws AnalysisException {
+<span class="fc" id="L137">        removeJreEntries(dependency);</span>
+<span class="fc" id="L138">        removeBadMatches(dependency);</span>
+<span class="fc" id="L139">        removeBadSpringMatches(dependency);</span>
+<span class="fc" id="L140">        removeWrongVersionMatches(dependency);</span>
+<span class="fc" id="L141">        removeSpuriousCPE(dependency);</span>
+<span class="fc" id="L142">        removeDuplicativeEntriesFromJar(dependency, engine);</span>
+<span class="fc" id="L143">        addFalseNegativeCPEs(dependency);</span>
+<span class="fc" id="L144">    }</span>
+
+    /**
+     * Removes inaccurate matches on springframework CPEs.
+     *
+     * @param dependency the dependency to test for and remove known inaccurate
+     * CPE matches
+     */
+    private void removeBadSpringMatches(Dependency dependency) {
+<span class="fc" id="L153">        String mustContain = null;</span>
+<span class="fc bfc" id="L154" title="All 2 branches covered.">        for (Identifier i : dependency.getSoftwareIdentifiers()) {</span>
+<span class="pc bpc" id="L155" title="2 of 4 branches missed.">            if (i.getValue() != null &amp;&amp; i.getValue().startsWith(&quot;org.springframework.&quot;)) {</span>
+<span class="nc" id="L156">                final int endPoint = i.getValue().indexOf(':', 19);</span>
+<span class="nc bnc" id="L157" title="All 2 branches missed.">                if (endPoint &gt;= 0) {</span>
+<span class="nc" id="L158">                    mustContain = i.getValue().substring(19, endPoint).toLowerCase();</span>
+<span class="nc" id="L159">                    break;</span>
+                }
+            }
+<span class="fc" id="L162">        }</span>
+<span class="pc bpc" id="L163" title="1 of 2 branches missed.">        if (mustContain != null) {</span>
+<span class="nc" id="L164">            final Set&lt;Identifier&gt; removalSet = new HashSet&lt;&gt;();</span>
+<span class="nc bnc" id="L165" title="All 2 branches missed.">            for (Identifier i : dependency.getVulnerableSoftwareIdentifiers()) {</span>
+<span class="nc bnc" id="L166" title="All 2 branches missed.">                if (i.getValue() != null</span>
+<span class="nc bnc" id="L167" title="All 2 branches missed.">                        &amp;&amp; i.getValue().startsWith(&quot;cpe:/a:springsource:&quot;)</span>
+<span class="nc bnc" id="L168" title="All 2 branches missed.">                        &amp;&amp; !i.getValue().toLowerCase().contains(mustContain)) {</span>
+<span class="nc" id="L169">                    removalSet.add(i);</span>
+                }
+<span class="nc" id="L171">            }</span>
+<span class="nc" id="L172">            removalSet.forEach((i) -&gt; {</span>
+<span class="nc" id="L173">                dependency.removeVulnerableSoftwareIdentifier(i);</span>
+<span class="nc" id="L174">            });</span>
+        }
+<span class="fc" id="L176">    }</span>
+
+    /**
+     * &lt;p&gt;
+     * Intended to remove spurious CPE entries. By spurious we mean duplicate,
+     * less specific CPE entries.&lt;/p&gt;
+     * &lt;p&gt;
+     * Example:&lt;/p&gt;
+     * &lt;code&gt;
+     * cpe:/a:some-vendor:some-product
+     * cpe:/a:some-vendor:some-product:1.5
+     * cpe:/a:some-vendor:some-product:1.5.2
+     * &lt;/code&gt;
+     * &lt;p&gt;
+     * Should be trimmed to:&lt;/p&gt;
+     * &lt;code&gt;
+     * cpe:/a:some-vendor:some-product:1.5.2
+     * &lt;/code&gt;
+     *
+     * @param dependency the dependency being analyzed
+     */
+    @SuppressWarnings(&quot;null&quot;)
+    private void removeSpuriousCPE(Dependency dependency) {
+<span class="fc" id="L199">        final List&lt;Identifier&gt; ids = new ArrayList&lt;&gt;(dependency.getVulnerableSoftwareIdentifiers());</span>
+<span class="fc" id="L200">        Collections.sort(ids);</span>
+<span class="fc" id="L201">        final ListIterator&lt;Identifier&gt; mainItr = ids.listIterator();</span>
+<span class="fc bfc" id="L202" title="All 2 branches covered.">        while (mainItr.hasNext()) {</span>
+<span class="fc" id="L203">            final Identifier temp = mainItr.next();</span>
+<span class="pc bpc" id="L204" title="1 of 2 branches missed.">            if (temp instanceof CpeIdentifier) {</span>
+<span class="fc" id="L205">                final CpeIdentifier currentId = (CpeIdentifier) temp;</span>
+<span class="fc" id="L206">                final Cpe currentCpe = currentId.getCpe();</span>
+<span class="fc" id="L207">                final ListIterator&lt;Identifier&gt; subItr = ids.listIterator(mainItr.nextIndex());</span>
+<span class="fc bfc" id="L208" title="All 2 branches covered.">                while (subItr.hasNext()) {</span>
+<span class="fc" id="L209">                    final Identifier nextId = subItr.next();</span>
+<span class="pc bpc" id="L210" title="1 of 2 branches missed.">                    if (nextId instanceof CpeIdentifier) {</span>
+<span class="fc" id="L211">                        final CpeIdentifier nextCpeId = (CpeIdentifier) nextId;</span>
+<span class="fc" id="L212">                        final Cpe nextCpe = nextCpeId.getCpe();</span>
+                        //TODO fix the version problem below
+<span class="fc bfc" id="L214" title="All 2 branches covered.">                        if (currentCpe.getVendor().equals(nextCpe.getVendor())) {</span>
+<span class="fc bfc" id="L215" title="All 2 branches covered.">                            if (currentCpe.getProduct().equals(nextCpe.getProduct())) {</span>
+                                // see if one is contained in the other.. remove the contained one from dependency.getIdentifier
+<span class="fc" id="L217">                                final String currentVersion = currentCpe.getVersion();</span>
+<span class="fc" id="L218">                                final String nextVersion = nextCpe.getVersion();</span>
+<span class="pc bpc" id="L219" title="3 of 4 branches missed.">                                if (currentVersion == null &amp;&amp; nextVersion == null) {</span>
+                                    //how did we get here?
+<span class="nc" id="L221">                                    LOGGER.debug(&quot;currentVersion and nextVersion are both null?&quot;);</span>
+<span class="pc bpc" id="L222" title="3 of 4 branches missed.">                                } else if (currentVersion == null &amp;&amp; nextVersion != null) {</span>
+<span class="nc" id="L223">                                    dependency.removeVulnerableSoftwareIdentifier(currentId);</span>
+<span class="pc bpc" id="L224" title="3 of 4 branches missed.">                                } else if (nextVersion == null &amp;&amp; currentVersion != null) {</span>
+<span class="nc" id="L225">                                    dependency.removeVulnerableSoftwareIdentifier(nextId);</span>
+<span class="pc bpc" id="L226" title="1 of 2 branches missed.">                                } else if (currentVersion.length() &lt; nextVersion.length()) {</span>
+<span class="nc bnc" id="L227" title="All 4 branches missed.">                                    if (nextVersion.startsWith(currentVersion) || &quot;-&quot;.equals(currentVersion)) {</span>
+<span class="nc" id="L228">                                        dependency.removeVulnerableSoftwareIdentifier(currentId);</span>
+                                    }
+<span class="pc bpc" id="L230" title="3 of 4 branches missed.">                                } else if (currentVersion.startsWith(nextVersion) || &quot;-&quot;.equals(nextVersion)) {</span>
+<span class="fc" id="L231">                                    dependency.removeVulnerableSoftwareIdentifier(nextId);</span>
+                                }
+                            }
+                        }
+                    }
+<span class="fc" id="L236">                }</span>
+            }
+<span class="fc" id="L238">        }</span>
+<span class="fc" id="L239">    }</span>
+
+    /**
+     * Removes any CPE entries for the JDK/JRE unless the filename ends with
+     * rt.jar
+     *
+     * @param dependency the dependency to remove JRE CPEs from
+     */
+    private void removeJreEntries(Dependency dependency) {
+<span class="fc" id="L248">        final Set&lt;Identifier&gt; removalSet = new HashSet&lt;&gt;();</span>
+<span class="fc" id="L249">        dependency.getVulnerableSoftwareIdentifiers().stream().forEach(i -&gt; {</span>
+<span class="fc" id="L250">            final Matcher coreCPE = CORE_JAVA.matcher(i.getValue());</span>
+<span class="fc" id="L251">            final Matcher coreFiles = CORE_FILES.matcher(dependency.getFileName());</span>
+<span class="fc" id="L252">            final Matcher coreJsfCPE = CORE_JAVA_JSF.matcher(i.getValue());</span>
+<span class="fc" id="L253">            final Matcher coreJsfFiles = CORE_JSF_FILES.matcher(dependency.getFileName());</span>
+<span class="pc bpc" id="L254" title="3 of 4 branches missed.">            if ((coreCPE.matches() &amp;&amp; !coreFiles.matches())</span>
+<span class="pc bpc" id="L255" title="3 of 4 branches missed.">                    || (coreJsfCPE.matches() &amp;&amp; !coreJsfFiles.matches())) {</span>
+<span class="nc" id="L256">                removalSet.add(i);</span>
+            }
+
+<span class="fc" id="L259">        });</span>
+<span class="fc" id="L260">        removalSet.forEach((i) -&gt; {</span>
+<span class="nc" id="L261">            dependency.removeVulnerableSoftwareIdentifier(i);</span>
+<span class="nc" id="L262">        });</span>
+<span class="fc" id="L263">    }</span>
+
+    /**
+     * Removes bad CPE matches for a dependency. Unfortunately, right now these
+     * are hard-coded patches for specific problems identified when testing this
+     * on a LARGE volume of jar files.
+     *
+     * @param dependency the dependency to analyze
+     */
+    protected void removeBadMatches(Dependency dependency) {
+
+        /* TODO - can we utilize the pom's groupid and artifactId to filter??? most of
+         * these are due to low quality data.  Other idea would be to say any CPE
+         * found based on LOW confidence evidence should have a different CPE type? (this
+         * might be a better solution then just removing the URL for &quot;best-guess&quot; matches).
+         */
+        //Set&lt;Evidence&gt; groupId = dependency.getVendorEvidence().getEvidence(&quot;pom&quot;, &quot;groupid&quot;);
+        //Set&lt;Evidence&gt; artifactId = dependency.getVendorEvidence().getEvidence(&quot;pom&quot;, &quot;artifactid&quot;);
+<span class="fc bfc" id="L281" title="All 2 branches covered.">        for (Identifier i : dependency.getVulnerableSoftwareIdentifiers()) {</span>
+            //TODO move this startsWith expression to the base suppression file
+<span class="pc bpc" id="L283" title="1 of 2 branches missed.">            if (i instanceof CpeIdentifier) {</span>
+<span class="fc" id="L284">                final CpeIdentifier cpeId = (CpeIdentifier) i;</span>
+<span class="fc" id="L285">                final Cpe cpe = cpeId.getCpe();</span>
+<span class="pc bpc" id="L286" title="1 of 2 branches missed.">                if ((cpe.getProduct().matches(&quot;.*c\\+\\+.*&quot;)</span>
+<span class="pc bpc" id="L287" title="3 of 4 branches missed.">                        || (&quot;file&quot;.equals(cpe.getVendor()) &amp;&amp; &quot;file&quot;.equals(cpe.getProduct()))</span>
+<span class="pc bpc" id="L288" title="3 of 4 branches missed.">                        || (&quot;mozilla&quot;.equals(cpe.getVendor()) &amp;&amp; &quot;mozilla&quot;.equals(cpe.getProduct()))</span>
+<span class="pc bpc" id="L289" title="3 of 4 branches missed.">                        || (&quot;cvs&quot;.equals(cpe.getVendor()) &amp;&amp; &quot;cvs&quot;.equals(cpe.getProduct()))</span>
+<span class="pc bpc" id="L290" title="3 of 4 branches missed.">                        || (&quot;ftp&quot;.equals(cpe.getVendor()) &amp;&amp; &quot;ftp&quot;.equals(cpe.getProduct()))</span>
+<span class="pc bpc" id="L291" title="3 of 4 branches missed.">                        || (&quot;tcp&quot;.equals(cpe.getVendor()) &amp;&amp; &quot;tcp&quot;.equals(cpe.getProduct()))</span>
+<span class="pc bpc" id="L292" title="3 of 4 branches missed.">                        || (&quot;ssh&quot;.equals(cpe.getVendor()) &amp;&amp; &quot;ssh&quot;.equals(cpe.getProduct()))</span>
+<span class="pc bpc" id="L293" title="3 of 4 branches missed.">                        || (&quot;lookup&quot;.equals(cpe.getVendor()) &amp;&amp; &quot;lookup&quot;.equals(cpe.getProduct())))</span>
+<span class="nc bnc" id="L294" title="All 2 branches missed.">                        &amp;&amp; (dependency.getFileName().toLowerCase().endsWith(&quot;.jar&quot;)</span>
+<span class="nc bnc" id="L295" title="All 2 branches missed.">                        || dependency.getFileName().toLowerCase().endsWith(&quot;pom.xml&quot;)</span>
+<span class="nc bnc" id="L296" title="All 2 branches missed.">                        || dependency.getFileName().toLowerCase().endsWith(&quot;.dll&quot;)</span>
+<span class="nc bnc" id="L297" title="All 2 branches missed.">                        || dependency.getFileName().toLowerCase().endsWith(&quot;.exe&quot;)</span>
+<span class="nc bnc" id="L298" title="All 2 branches missed.">                        || dependency.getFileName().toLowerCase().endsWith(&quot;.nuspec&quot;)</span>
+<span class="nc bnc" id="L299" title="All 2 branches missed.">                        || dependency.getFileName().toLowerCase().endsWith(&quot;.zip&quot;)</span>
+<span class="nc bnc" id="L300" title="All 2 branches missed.">                        || dependency.getFileName().toLowerCase().endsWith(&quot;.sar&quot;)</span>
+<span class="nc bnc" id="L301" title="All 2 branches missed.">                        || dependency.getFileName().toLowerCase().endsWith(&quot;.apk&quot;)</span>
+<span class="nc bnc" id="L302" title="All 2 branches missed.">                        || dependency.getFileName().toLowerCase().endsWith(&quot;.tar&quot;)</span>
+<span class="nc bnc" id="L303" title="All 2 branches missed.">                        || dependency.getFileName().toLowerCase().endsWith(&quot;.gz&quot;)</span>
+<span class="nc bnc" id="L304" title="All 2 branches missed.">                        || dependency.getFileName().toLowerCase().endsWith(&quot;.tgz&quot;)</span>
+<span class="nc bnc" id="L305" title="All 2 branches missed.">                        || dependency.getFileName().toLowerCase().endsWith(&quot;.ear&quot;)</span>
+<span class="nc bnc" id="L306" title="All 2 branches missed.">                        || dependency.getFileName().toLowerCase().endsWith(&quot;.war&quot;))) {</span>
+<span class="nc" id="L307">                    dependency.removeVulnerableSoftwareIdentifier(i);</span>
+<span class="pc bpc" id="L308" title="3 of 4 branches missed.">                } else if (((&quot;jquery&quot;.equals(cpe.getVendor()) &amp;&amp; &quot;jquery&quot;.equals(cpe.getProduct()))</span>
+<span class="pc bpc" id="L309" title="3 of 4 branches missed.">                        || (&quot;prototypejs&quot;.equals(cpe.getVendor()) &amp;&amp; &quot;prototype&quot;.equals(cpe.getProduct()))</span>
+<span class="pc bpc" id="L310" title="3 of 4 branches missed.">                        || (&quot;yahoo&quot;.equals(cpe.getVendor()) &amp;&amp; &quot;yui&quot;.equals(cpe.getProduct())))</span>
+<span class="nc bnc" id="L311" title="All 2 branches missed.">                        &amp;&amp; (dependency.getFileName().toLowerCase().endsWith(&quot;.jar&quot;)</span>
+<span class="nc bnc" id="L312" title="All 2 branches missed.">                        || dependency.getFileName().toLowerCase().endsWith(&quot;pom.xml&quot;)</span>
+<span class="nc bnc" id="L313" title="All 2 branches missed.">                        || dependency.getFileName().toLowerCase().endsWith(&quot;.dll&quot;)</span>
+<span class="nc bnc" id="L314" title="All 2 branches missed.">                        || dependency.getFileName().toLowerCase().endsWith(&quot;.exe&quot;))) {</span>
+<span class="nc" id="L315">                    dependency.removeVulnerableSoftwareIdentifier(i);</span>
+<span class="pc bpc" id="L316" title="3 of 4 branches missed.">                } else if (((&quot;microsoft&quot;.equals(cpe.getVendor()) &amp;&amp; &quot;excel&quot;.equals(cpe.getProduct()))</span>
+<span class="pc bpc" id="L317" title="3 of 4 branches missed.">                        || (&quot;microsoft&quot;.equals(cpe.getVendor()) &amp;&amp; &quot;word&quot;.equals(cpe.getProduct()))</span>
+<span class="pc bpc" id="L318" title="3 of 4 branches missed.">                        || (&quot;microsoft&quot;.equals(cpe.getVendor()) &amp;&amp; &quot;visio&quot;.equals(cpe.getProduct()))</span>
+<span class="pc bpc" id="L319" title="3 of 4 branches missed.">                        || (&quot;microsoft&quot;.equals(cpe.getVendor()) &amp;&amp; &quot;powerpoint&quot;.equals(cpe.getProduct()))</span>
+<span class="pc bpc" id="L320" title="3 of 4 branches missed.">                        || (&quot;microsoft&quot;.equals(cpe.getVendor()) &amp;&amp; &quot;office&quot;.equals(cpe.getProduct()))</span>
+<span class="pc bpc" id="L321" title="3 of 4 branches missed.">                        || (&quot;core_ftp&quot;.equals(cpe.getVendor()) &amp;&amp; &quot;core_ftp&quot;.equals(cpe.getProduct())))</span>
+<span class="nc bnc" id="L322" title="All 2 branches missed.">                        &amp;&amp; (dependency.getFileName().toLowerCase().endsWith(&quot;.jar&quot;)</span>
+<span class="nc bnc" id="L323" title="All 2 branches missed.">                        || dependency.getFileName().toLowerCase().endsWith(&quot;.ear&quot;)</span>
+<span class="nc bnc" id="L324" title="All 2 branches missed.">                        || dependency.getFileName().toLowerCase().endsWith(&quot;.war&quot;)</span>
+<span class="nc bnc" id="L325" title="All 2 branches missed.">                        || dependency.getFileName().toLowerCase().endsWith(&quot;pom.xml&quot;))) {</span>
+<span class="nc" id="L326">                    dependency.removeVulnerableSoftwareIdentifier(i);</span>
+<span class="pc bpc" id="L327" title="1 of 4 branches missed.">                } else if ((&quot;apache&quot;.equals(cpe.getVendor()) &amp;&amp; &quot;maven&quot;.equals(cpe.getProduct()))</span>
+<span class="nc bnc" id="L328" title="All 2 branches missed.">                        &amp;&amp; !dependency.getFileName().toLowerCase().matches(&quot;maven-core-[\\d\\.]+\\.jar&quot;)) {</span>
+<span class="nc" id="L329">                    dependency.removeVulnerableSoftwareIdentifier(i);</span>
+<span class="pc bpc" id="L330" title="3 of 4 branches missed.">                } else if ((&quot;m-core&quot;.equals(cpe.getVendor()) &amp;&amp; &quot;m-core&quot;.equals(cpe.getProduct()))) {</span>
+<span class="nc" id="L331">                    boolean found = false;</span>
+<span class="nc bnc" id="L332" title="All 2 branches missed.">                    for (Evidence e : dependency.getEvidence(EvidenceType.PRODUCT)) {</span>
+<span class="nc bnc" id="L333" title="All 2 branches missed.">                        if (&quot;m-core&quot;.equalsIgnoreCase(e.getValue())) {</span>
+<span class="nc" id="L334">                            found = true;</span>
+<span class="nc" id="L335">                            break;</span>
+                        }
+<span class="nc" id="L337">                    }</span>
+<span class="nc bnc" id="L338" title="All 2 branches missed.">                    if (!found) {</span>
+<span class="nc bnc" id="L339" title="All 2 branches missed.">                        for (Evidence e : dependency.getEvidence(EvidenceType.VENDOR)) {</span>
+<span class="nc bnc" id="L340" title="All 2 branches missed.">                            if (&quot;m-core&quot;.equalsIgnoreCase(e.getValue())) {</span>
+<span class="nc" id="L341">                                found = true;</span>
+<span class="nc" id="L342">                                break;</span>
+                            }
+<span class="nc" id="L344">                        }</span>
+                    }
+<span class="nc bnc" id="L346" title="All 2 branches missed.">                    if (!found) {</span>
+<span class="nc" id="L347">                        dependency.removeVulnerableSoftwareIdentifier(i);</span>
+                    }
+<span class="pc bpc" id="L349" title="3 of 4 branches missed.">                } else if ((&quot;jboss&quot;.equals(cpe.getVendor()) &amp;&amp; &quot;jboss&quot;.equals(cpe.getProduct()))</span>
+<span class="nc bnc" id="L350" title="All 2 branches missed.">                        &amp;&amp; !dependency.getFileName().toLowerCase().matches(&quot;jboss-?[\\d\\.-]+(GA)?\\.jar&quot;)) {</span>
+<span class="nc" id="L351">                    dependency.removeVulnerableSoftwareIdentifier(i);</span>
+                }
+            }
+<span class="fc" id="L354">        }</span>
+<span class="fc" id="L355">    }</span>
+
+    /**
+     * Removes CPE matches for the wrong version of a dependency. Currently,
+     * this only covers Axis 1 &amp; 2.
+     *
+     * @param dependency the dependency to analyze
+     */
+    private void removeWrongVersionMatches(Dependency dependency) {
+<span class="fc" id="L364">        final Set&lt;Identifier&gt; identifiersToRemove = new HashSet&lt;&gt;();</span>
+<span class="fc" id="L365">        final String fileName = dependency.getFileName();</span>
+<span class="pc bpc" id="L366" title="1 of 4 branches missed.">        if (fileName != null &amp;&amp; fileName.contains(&quot;axis2&quot;)) {</span>
+<span class="fc" id="L367">            dependency.getVulnerableSoftwareIdentifiers().stream()</span>
+<span class="fc" id="L368">                    .filter((i) -&gt; (i instanceof CpeIdentifier))</span>
+<span class="fc" id="L369">                    .map(i -&gt; (CpeIdentifier) i)</span>
+<span class="fc" id="L370">                    .forEach((i) -&gt; {</span>
+<span class="fc" id="L371">                        final Cpe cpe = i.getCpe();</span>
+<span class="pc bpc" id="L372" title="2 of 4 branches missed.">                        if (&quot;apache&quot;.equals(cpe.getVendor()) &amp;&amp; &quot;axis&quot;.equals(cpe.getProduct())) {</span>
+<span class="fc" id="L373">                            identifiersToRemove.add(i);</span>
+                        }
+<span class="fc" id="L375">                    });</span>
+<span class="pc bpc" id="L376" title="1 of 4 branches missed.">        } else if (fileName != null &amp;&amp; fileName.contains(&quot;axis&quot;)) {</span>
+<span class="fc" id="L377">            dependency.getVulnerableSoftwareIdentifiers().stream()</span>
+<span class="fc" id="L378">                    .filter((i) -&gt; (i instanceof CpeIdentifier))</span>
+<span class="fc" id="L379">                    .map(i -&gt; (CpeIdentifier) i)</span>
+<span class="fc" id="L380">                    .forEach((i) -&gt; {</span>
+<span class="fc" id="L381">                        final Cpe cpe = i.getCpe();</span>
+<span class="pc bpc" id="L382" title="2 of 4 branches missed.">                        if (&quot;apache&quot;.equals(cpe.getVendor()) &amp;&amp; &quot;axis2&quot;.equals(cpe.getProduct())) {</span>
+<span class="nc" id="L383">                            identifiersToRemove.add(i);</span>
+                        }
+<span class="fc" id="L385">                    });</span>
+        }
+<span class="fc" id="L387">        identifiersToRemove.forEach((i) -&gt; {</span>
+<span class="fc" id="L388">            dependency.removeVulnerableSoftwareIdentifier(i);</span>
+<span class="fc" id="L389">        });</span>
+<span class="fc" id="L390">    }</span>
+
+    /**
+     * There are some known CPE entries, specifically regarding sun and oracle
+     * products due to the acquisition and changes in product names, that based
+     * on given evidence we can add the related CPE entries to ensure a complete
+     * list of CVE entries.
+     *
+     * @param dependency the dependency being analyzed
+     */
+    @SuppressWarnings(&quot;UnnecessaryParentheses&quot;)
+    private void addFalseNegativeCPEs(Dependency dependency) {
+<span class="fc" id="L402">        final CpeBuilder builder = new CpeBuilder();</span>
+        //TODO move this to the hint analyzer
+<span class="fc" id="L404">        dependency.getVulnerableSoftwareIdentifiers().stream()</span>
+<span class="fc" id="L405">                .filter((i) -&gt; (i instanceof CpeIdentifier))</span>
+<span class="fc" id="L406">                .map(i -&gt; (CpeIdentifier) i)</span>
+<span class="fc" id="L407">                .forEach((i) -&gt; {</span>
+<span class="fc" id="L408">                    final Cpe cpe = i.getCpe();</span>
+<span class="fc bfc" id="L409" title="All 2 branches covered.">                    if (((&quot;oracle&quot;.equals(cpe.getVendor())</span>
+<span class="pc bpc" id="L410" title="2 of 4 branches missed.">                            &amp;&amp; (&quot;opensso&quot;.equals(cpe.getProduct()) || &quot;opensso_enterprise&quot;.equals(cpe.getProduct()))))</span>
+<span class="pc bpc" id="L411" title="1 of 2 branches missed.">                            || (&quot;sun&quot;.equals(cpe.getVendor())</span>
+<span class="nc bnc" id="L412" title="All 4 branches missed.">                            &amp;&amp; (&quot;opensso&quot;.equals(cpe.getProduct()) || &quot;opensso_enterprise&quot;.equals(cpe.getProduct())))) {</span>
+
+                        try {
+<span class="nc" id="L415">                            final Cpe newCpe1 = builder.part(Part.APPLICATION).vendor(&quot;sun&quot;)</span>
+<span class="nc" id="L416">                                    .product(&quot;opensso_enterprise&quot;).version(cpe.getVersion()).build();</span>
+<span class="nc" id="L417">                            final Cpe newCpe2 = builder.part(Part.APPLICATION).vendor(&quot;oracle&quot;)</span>
+<span class="nc" id="L418">                                    .product(&quot;opensso_enterprise&quot;).version(cpe.getVersion()).build();</span>
+<span class="nc" id="L419">                            final Cpe newCpe3 = builder.part(Part.APPLICATION).vendor(&quot;sun&quot;)</span>
+<span class="nc" id="L420">                                    .product(&quot;opensso&quot;).version(cpe.getVersion()).build();</span>
+<span class="nc" id="L421">                            final Cpe newCpe4 = builder.part(Part.APPLICATION).vendor(&quot;oracle&quot;)</span>
+<span class="nc" id="L422">                                    .product(&quot;opensso&quot;).version(cpe.getVersion()).build();</span>
+<span class="nc" id="L423">                            final CpeIdentifier newCpeId1 = new CpeIdentifier(newCpe1, i.getConfidence());</span>
+<span class="nc" id="L424">                            final CpeIdentifier newCpeId2 = new CpeIdentifier(newCpe2, i.getConfidence());</span>
+<span class="nc" id="L425">                            final CpeIdentifier newCpeId3 = new CpeIdentifier(newCpe3, i.getConfidence());</span>
+<span class="nc" id="L426">                            final CpeIdentifier newCpeId4 = new CpeIdentifier(newCpe4, i.getConfidence());</span>
+<span class="nc" id="L427">                            dependency.addVulnerableSoftwareIdentifier(newCpeId1);</span>
+<span class="nc" id="L428">                            dependency.addVulnerableSoftwareIdentifier(newCpeId2);</span>
+<span class="nc" id="L429">                            dependency.addVulnerableSoftwareIdentifier(newCpeId3);</span>
+<span class="nc" id="L430">                            dependency.addVulnerableSoftwareIdentifier(newCpeId4);</span>
+
+<span class="nc" id="L432">                        } catch (CpeValidationException ex) {</span>
+<span class="nc" id="L433">                            LOGGER.warn(&quot;Unable to add oracle and sun CPEs&quot;, ex);</span>
+<span class="nc" id="L434">                        }</span>
+                    }
+<span class="pc bpc" id="L436" title="1 of 4 branches missed.">                    if (&quot;apache&quot;.equals(cpe.getVendor()) &amp;&amp; &quot;santuario_xml_security_for_java&quot;.equals(cpe.getProduct())) {</span>
+                        try {
+<span class="nc" id="L438">                            final Cpe newCpe1 = builder.part(Part.APPLICATION).vendor(&quot;apache&quot;)</span>
+<span class="nc" id="L439">                                    .product(&quot;xml_security_for_java&quot;).version(cpe.getVersion()).build();</span>
+<span class="nc" id="L440">                            final CpeIdentifier newCpeId1 = new CpeIdentifier(newCpe1, i.getConfidence());</span>
+<span class="nc" id="L441">                            dependency.addVulnerableSoftwareIdentifier(newCpeId1);</span>
+<span class="nc" id="L442">                        } catch (CpeValidationException ex) {</span>
+<span class="nc" id="L443">                            LOGGER.warn(&quot;Unable to add apache xml_security_for_java CPE&quot;, ex);</span>
+<span class="nc" id="L444">                        }</span>
+                    }
+<span class="fc" id="L446">                });</span>
+<span class="fc" id="L447">    }</span>
+
+    /**
+     * Removes duplicate entries identified that are contained within JAR files.
+     * These occasionally crop up due to POM entries or other types of files
+     * (such as DLLs and EXEs) being contained within the JAR.
+     *
+     * @param dependency the dependency that might be a duplicate
+     * @param engine the engine used to scan all dependencies
+     */
+    private synchronized void removeDuplicativeEntriesFromJar(Dependency dependency, Engine engine) {
+<span class="fc bfc" id="L458" title="All 2 branches covered.">        if (dependency.getFileName().toLowerCase().endsWith(&quot;pom.xml&quot;)</span>
+<span class="fc bfc" id="L459" title="All 2 branches covered.">                || DLL_EXE_FILTER.accept(dependency.getActualFile())) {</span>
+<span class="fc" id="L460">            String parentPath = dependency.getFilePath().toLowerCase();</span>
+<span class="fc bfc" id="L461" title="All 2 branches covered.">            if (parentPath.contains(&quot;.jar&quot;)) {</span>
+<span class="fc" id="L462">                parentPath = parentPath.substring(0, parentPath.indexOf(&quot;.jar&quot;) + 4);</span>
+<span class="fc" id="L463">                final Dependency[] dependencies = engine.getDependencies();</span>
+<span class="fc" id="L464">                final Dependency parent = findDependency(parentPath, dependencies);</span>
+<span class="pc bpc" id="L465" title="1 of 2 branches missed.">                if (parent != null) {</span>
+<span class="fc" id="L466">                    final boolean remove = dependency.getVulnerableSoftwareIdentifiers().stream()</span>
+<span class="fc" id="L467">                            .filter((i) -&gt; (i instanceof CpeIdentifier))</span>
+<span class="fc" id="L468">                            .map(i -&gt; (CpeIdentifier) i)</span>
+<span class="fc" id="L469">                            .anyMatch(i -&gt; {</span>
+<span class="fc" id="L470">                                return parent.getVulnerableSoftwareIdentifiers().stream()</span>
+<span class="fc" id="L471">                                        .filter((p) -&gt; (p instanceof CpeIdentifier))</span>
+<span class="fc" id="L472">                                        .map(p -&gt; (CpeIdentifier) p)</span>
+<span class="pc bpc" id="L473" title="1 of 2 branches missed.">                                        .anyMatch(p -&gt; !p.equals(i)</span>
+<span class="pc bpc" id="L474" title="1 of 2 branches missed.">                                        &amp;&amp; p.getCpe().getPart().equals(i.getCpe().getPart())</span>
+<span class="pc bpc" id="L475" title="1 of 2 branches missed.">                                        &amp;&amp; p.getCpe().getVendor().equals(i.getCpe().getVendor())</span>
+<span class="pc bnc" id="L476" title="All 2 branches missed.">                                        &amp;&amp; p.getCpe().getProduct().equals(i.getCpe().getProduct()));</span>
+                            });
+<span class="pc bpc" id="L478" title="1 of 2 branches missed.">                    if (remove) {</span>
+<span class="nc" id="L479">                        engine.removeDependency(dependency);</span>
+                    }
+                }
+            }
+        }
+<span class="fc" id="L484">    }</span>
+
+    /**
+     * Retrieves a given dependency, based on a given path, from a list of
+     * dependencies.
+     *
+     * @param dependencyPath the path of the dependency to return
+     * @param dependencies the array of dependencies to search
+     * @return the dependency object for the given path, otherwise null
+     */
+    private Dependency findDependency(String dependencyPath, Dependency[] dependencies) {
+<span class="pc bpc" id="L495" title="1 of 2 branches missed.">        for (Dependency d : dependencies) {</span>
+<span class="fc bfc" id="L496" title="All 2 branches covered.">            if (d.getFilePath().equalsIgnoreCase(dependencyPath)) {</span>
+<span class="fc" id="L497">                return d;</span>
+            }
+        }
+<span class="nc" id="L500">        return null;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.2.201808211720</span></div></body></html>

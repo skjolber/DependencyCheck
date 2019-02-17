@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../jacoco-resources/report.gif" type="image/gif"/><title>NvdCveAnalyzer.java</title><link rel="stylesheet" href="../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../index.html" class="el_report">Dependency-Check Ant Task</a> &gt; <a href="../index.html" class="el_bundle">dependency-check-core</a> &gt; <a href="index.source.html" class="el_package">org.owasp.dependencycheck.analyzer</a> &gt; <span class="el_source">NvdCveAnalyzer.java</span></div><h1>NvdCveAnalyzer.java</h1><pre class="source lang-java linenums">/*
+ * This file is part of dependency-check-core.
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ * Copyright (c) 2012 Jeremy Long. All Rights Reserved.
+ */
+package org.owasp.dependencycheck.analyzer;
+
+import java.util.List;
+import javax.annotation.concurrent.ThreadSafe;
+import org.owasp.dependencycheck.Engine;
+import org.owasp.dependencycheck.analyzer.exception.AnalysisException;
+import org.owasp.dependencycheck.analyzer.exception.LambdaExceptionWrapper;
+import org.owasp.dependencycheck.data.nvdcve.CveDB;
+import org.owasp.dependencycheck.data.nvdcve.DatabaseException;
+import org.owasp.dependencycheck.dependency.Dependency;
+import org.owasp.dependencycheck.dependency.Vulnerability;
+import org.owasp.dependencycheck.dependency.naming.CpeIdentifier;
+import org.owasp.dependencycheck.utils.Settings;
+
+/**
+ * NvdCveAnalyzer is a utility class that takes a project dependency and
+ * attempts to discern if there is an associated CVEs. It uses the the
+ * identifiers found by other analyzers to lookup the CVE data.
+ *
+ * @author Jeremy Long
+ */
+@ThreadSafe
+<span class="fc" id="L40">public class NvdCveAnalyzer extends AbstractAnalyzer {</span>
+
+    /**
+     * The Logger for use throughout the class
+     */
+    //private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(NvdCveAnalyzer.class);
+    /**
+     * Analyzes a dependency and attempts to determine if there are any CPE
+     * identifiers for this dependency.
+     *
+     * @param dependency The Dependency to analyze
+     * @param engine The analysis engine
+     * @throws AnalysisException thrown if there is an issue analyzing the
+     * dependency
+     */
+    @Override
+    protected void analyzeDependency(Dependency dependency, Engine engine) throws AnalysisException {
+<span class="fc" id="L57">        final CveDB cveDB = engine.getDatabase();</span>
+        try {
+<span class="fc" id="L59">            dependency.getVulnerableSoftwareIdentifiers().stream()</span>
+<span class="fc" id="L60">                    .filter((i) -&gt; (i instanceof CpeIdentifier))</span>
+<span class="fc" id="L61">                    .map(i -&gt; (CpeIdentifier) i)</span>
+<span class="fc" id="L62">                    .forEach(i -&gt; {</span>
+                        try {
+<span class="fc" id="L64">                            final List&lt;Vulnerability&gt; vulns = cveDB.getVulnerabilities(i.getCpe());</span>
+<span class="fc" id="L65">                            dependency.addVulnerabilities(vulns);</span>
+<span class="nc" id="L66">                        } catch (DatabaseException ex) {</span>
+<span class="nc" id="L67">                            throw new LambdaExceptionWrapper(new AnalysisException(ex));</span>
+<span class="fc" id="L68">                        }</span>
+<span class="fc" id="L69">                    });</span>
+<span class="fc" id="L70">            dependency.getSuppressedIdentifiers().stream()</span>
+<span class="fc" id="L71">                    .filter((i) -&gt; (i instanceof CpeIdentifier))</span>
+<span class="fc" id="L72">                    .map(i -&gt; (CpeIdentifier) i)</span>
+<span class="fc" id="L73">                    .forEach(i -&gt; {</span>
+                        try {
+<span class="fc" id="L75">                            final List&lt;Vulnerability&gt; vulns = cveDB.getVulnerabilities(i.getCpe());</span>
+<span class="fc" id="L76">                            dependency.addSuppressedVulnerabilities(vulns);</span>
+<span class="nc" id="L77">                        } catch (DatabaseException ex) {</span>
+<span class="nc" id="L78">                            throw new LambdaExceptionWrapper(new AnalysisException(ex));</span>
+<span class="fc" id="L79">                        }</span>
+<span class="fc" id="L80">                    });</span>
+<span class="nc" id="L81">        } catch (LambdaExceptionWrapper ex) {</span>
+<span class="nc" id="L82">            throw (AnalysisException) ex.getCause();</span>
+<span class="fc" id="L83">        }</span>
+<span class="fc" id="L84">    }</span>
+
+    /**
+     * Returns the name of this analyzer.
+     *
+     * @return the name of this analyzer.
+     */
+    @Override
+    public String getName() {
+<span class="fc" id="L93">        return &quot;NVD CVE Analyzer&quot;;</span>
+    }
+
+    /**
+     * Returns the analysis phase that this analyzer should run in.
+     *
+     * @return the analysis phase that this analyzer should run in.
+     */
+    @Override
+    public AnalysisPhase getAnalysisPhase() {
+<span class="fc" id="L103">        return AnalysisPhase.FINDING_ANALYSIS;</span>
+    }
+
+    /**
+     * &lt;p&gt;
+     * Returns the setting key to determine if the analyzer is enabled.&lt;/p&gt;
+     *
+     * @return the key for the analyzer's enabled property
+     */
+    @Override
+    protected String getAnalyzerEnabledSettingKey() {
+<span class="fc" id="L114">        return Settings.KEYS.ANALYZER_NVD_CVE_ENABLED;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.2.201808211720</span></div></body></html>

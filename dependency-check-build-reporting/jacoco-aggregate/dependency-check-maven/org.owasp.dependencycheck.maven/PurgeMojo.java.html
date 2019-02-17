@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../jacoco-resources/report.gif" type="image/gif"/><title>PurgeMojo.java</title><link rel="stylesheet" href="../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../index.html" class="el_report">Dependency-Check Build-Reporting</a> &gt; <a href="../index.html" class="el_bundle">dependency-check-maven</a> &gt; <a href="index.source.html" class="el_package">org.owasp.dependencycheck.maven</a> &gt; <span class="el_source">PurgeMojo.java</span></div><h1>PurgeMojo.java</h1><pre class="source lang-java linenums">/*
+ * This file is part of dependency-check-maven.
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ * Copyright (c) 2015 Jeremy Long. All Rights Reserved.
+ */
+package org.owasp.dependencycheck.maven;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.Locale;
+import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.ResolutionScope;
+import org.owasp.dependencycheck.Engine;
+import org.owasp.dependencycheck.exception.ExceptionCollection;
+import org.owasp.dependencycheck.utils.Settings;
+
+/**
+ * Maven Plugin that purges the local copy of the NVD data.
+ *
+ * @author Jeremy Long
+ */
+@Mojo(
+        name = &quot;purge&quot;,
+        defaultPhase = LifecyclePhase.GENERATE_RESOURCES,
+        threadSafe = true,
+        requiresDependencyResolution = ResolutionScope.NONE,
+        requiresOnline = true,
+        aggregator = true
+)
+<span class="nc" id="L45">public class PurgeMojo extends BaseDependencyCheckMojo {</span>
+
+    /**
+     * Returns false; this mojo cannot generate a report.
+     *
+     * @return &lt;code&gt;false&lt;/code&gt;
+     */
+    @Override
+    public boolean canGenerateReport() {
+<span class="nc" id="L54">        return false;</span>
+    }
+
+    /**
+     * Purges the local copy of the NVD.
+     *
+     * @throws MojoExecutionException thrown if there is an exception executing
+     * the goal
+     * @throws MojoFailureException thrown if dependency-check is configured to
+     * fail the build
+     */
+    @Override
+    protected void runCheck() throws MojoExecutionException, MojoFailureException {
+
+<span class="nc bnc" id="L68" title="All 4 branches missed.">        if (getConnectionString() != null &amp;&amp; !getConnectionString().isEmpty()) {</span>
+<span class="nc" id="L69">            final String msg = &quot;Unable to purge the local NVD when using a non-default connection string&quot;;</span>
+<span class="nc bnc" id="L70" title="All 2 branches missed.">            if (this.isFailOnError()) {</span>
+<span class="nc" id="L71">                throw new MojoFailureException(msg);</span>
+            }
+<span class="nc" id="L73">            getLog().error(msg);</span>
+<span class="nc" id="L74">        } else {</span>
+<span class="nc" id="L75">            populateSettings();</span>
+            final File db;
+            try {
+<span class="nc" id="L78">                db = new File(getSettings().getDataDirectory(), getSettings().getString(Settings.KEYS.DB_FILE_NAME, &quot;dc.mv.db&quot;));</span>
+<span class="nc bnc" id="L79" title="All 2 branches missed.">                if (db.exists()) {</span>
+<span class="nc bnc" id="L80" title="All 2 branches missed.">                    if (db.delete()) {</span>
+<span class="nc" id="L81">                        getLog().info(&quot;Database file purged; local copy of the NVD has been removed&quot;);</span>
+                    } else {
+<span class="nc" id="L83">                        final String msg = String.format(&quot;Unable to delete '%s'; please delete the file manually&quot;, db.getAbsolutePath());</span>
+<span class="nc bnc" id="L84" title="All 2 branches missed.">                        if (this.isFailOnError()) {</span>
+<span class="nc" id="L85">                            throw new MojoFailureException(msg);</span>
+                        }
+<span class="nc" id="L87">                        getLog().error(msg);</span>
+<span class="nc" id="L88">                    }</span>
+                } else {
+<span class="nc" id="L90">                    final String msg = String.format(&quot;Unable to purge database; the database file does not exist: %s&quot;, db.getAbsolutePath());</span>
+<span class="nc bnc" id="L91" title="All 2 branches missed.">                    if (this.isFailOnError()) {</span>
+<span class="nc" id="L92">                        throw new MojoFailureException(msg);</span>
+                    }
+<span class="nc" id="L94">                    getLog().error(msg);</span>
+                }
+<span class="nc" id="L96">            } catch (IOException ex) {</span>
+<span class="nc" id="L97">                final String msg = &quot;Unable to delete the database&quot;;</span>
+<span class="nc bnc" id="L98" title="All 2 branches missed.">                if (this.isFailOnError()) {</span>
+<span class="nc" id="L99">                    throw new MojoExecutionException(msg, ex);</span>
+                }
+<span class="nc" id="L101">                getLog().error(msg);</span>
+<span class="nc" id="L102">            }</span>
+<span class="nc" id="L103">            getSettings().cleanup();</span>
+        }
+<span class="nc" id="L105">    }</span>
+
+    /**
+     * Returns the report name.
+     *
+     * @param locale the location
+     * @return the report name
+     */
+    @Override
+    public String getName(Locale locale) {
+<span class="nc" id="L115">        return &quot;dependency-check-purge&quot;;</span>
+    }
+
+    /**
+     * Gets the description of the Dependency-Check report to be displayed in
+     * the Maven Generated Reports page.
+     *
+     * @param locale The Locale to get the description for
+     * @return the description
+     */
+    @Override
+    public String getDescription(Locale locale) {
+<span class="nc" id="L127">        return &quot;Purges the local cache of the NVD dataT.&quot;;</span>
+    }
+
+    /**
+     * Throws an exception if called. The purge mojo does not scan dependencies.
+     *
+     * @param engine the engine used to scan
+     * @return a collection of exceptions
+     * @throws MojoExecutionException thrown if there is an exception
+     */
+    @Override
+    protected ExceptionCollection scanDependencies(Engine engine) throws MojoExecutionException {
+<span class="nc" id="L139">        throw new UnsupportedOperationException(&quot;Operation not supported&quot;);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.2.201808211720</span></div></body></html>

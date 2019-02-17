@@ -1,0 +1,255 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../jacoco-resources/report.gif" type="image/gif"/><title>AbstractSuppressionAnalyzer.java</title><link rel="stylesheet" href="../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../index.html" class="el_report">Dependency-Check Ant Task</a> &gt; <a href="../index.html" class="el_bundle">dependency-check-core</a> &gt; <a href="index.source.html" class="el_package">org.owasp.dependencycheck.analyzer</a> &gt; <span class="el_source">AbstractSuppressionAnalyzer.java</span></div><h1>AbstractSuppressionAnalyzer.java</h1><pre class="source lang-java linenums">/*
+ * This file is part of dependency-check-core.
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ * Copyright (c) 2013 Jeremy Long. All Rights Reserved.
+ */
+package org.owasp.dependencycheck.analyzer;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+import java.util.regex.Pattern;
+import javax.annotation.concurrent.ThreadSafe;
+import org.owasp.dependencycheck.Engine;
+import org.owasp.dependencycheck.analyzer.exception.AnalysisException;
+import org.owasp.dependencycheck.dependency.Dependency;
+import org.owasp.dependencycheck.exception.InitializationException;
+import org.owasp.dependencycheck.xml.suppression.SuppressionParseException;
+import org.owasp.dependencycheck.xml.suppression.SuppressionParser;
+import org.owasp.dependencycheck.xml.suppression.SuppressionRule;
+import org.owasp.dependencycheck.utils.DownloadFailedException;
+import org.owasp.dependencycheck.utils.Downloader;
+import org.owasp.dependencycheck.utils.FileUtils;
+import org.owasp.dependencycheck.utils.Settings;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.xml.sax.SAXException;
+
+/**
+ * Abstract base suppression analyzer that contains methods for parsing the
+ * suppression XML file.
+ *
+ * @author Jeremy Long
+ */
+@ThreadSafe
+<span class="fc" id="L52">public abstract class AbstractSuppressionAnalyzer extends AbstractAnalyzer {</span>
+
+    /**
+     * The Logger for use throughout the class.
+     */
+<span class="fc" id="L57">    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractSuppressionAnalyzer.class);</span>
+    /**
+     * The list of suppression rules.
+     */
+<span class="fc" id="L61">    private final List&lt;SuppressionRule&gt; rules = new ArrayList&lt;&gt;();</span>
+
+    /**
+     * Get the number of suppression rules.
+     *
+     * @return the number of suppression rules
+     */
+    protected int getRuleCount() {
+<span class="nc" id="L69">        return rules.size();</span>
+    }
+
+    /**
+     * Returns a list of file EXTENSIONS supported by this analyzer.
+     *
+     * @return a list of file EXTENSIONS supported by this analyzer.
+     */
+    public Set&lt;String&gt; getSupportedExtensions() {
+<span class="nc" id="L78">        return null;</span>
+    }
+
+    /**
+     * The prepare method loads the suppression XML file.
+     *
+     * @param engine a reference the dependency-check engine
+     * @throws InitializationException thrown if there is an exception
+     */
+    @Override
+    public synchronized void prepareAnalyzer(Engine engine) throws InitializationException {
+<span class="pc bpc" id="L89" title="1 of 2 branches missed.">        if (rules.isEmpty()) {</span>
+            try {
+<span class="fc" id="L91">                loadSuppressionBaseData();</span>
+<span class="nc" id="L92">            } catch (SuppressionParseException ex) {</span>
+<span class="nc" id="L93">                throw new InitializationException(&quot;Error initializing the suppression analyzer: &quot; + ex.getLocalizedMessage(), ex, true);</span>
+<span class="fc" id="L94">            }</span>
+
+            try {
+<span class="fc" id="L97">                loadSuppressionData();</span>
+<span class="nc" id="L98">            } catch (SuppressionParseException ex) {</span>
+<span class="nc" id="L99">                throw new InitializationException(&quot;Warn initializing the suppression analyzer: &quot; + ex.getLocalizedMessage(), ex, false);</span>
+<span class="fc" id="L100">            }</span>
+        }
+<span class="fc" id="L102">    }</span>
+
+    @Override
+    protected void analyzeDependency(Dependency dependency, Engine engine) throws AnalysisException {
+<span class="pc bpc" id="L106" title="1 of 2 branches missed.">        if (rules.isEmpty()) {</span>
+<span class="nc" id="L107">            return;</span>
+        }
+<span class="fc" id="L109">        rules.forEach((rule) -&gt; {</span>
+<span class="fc" id="L110">            rule.process(dependency);</span>
+<span class="fc" id="L111">        });</span>
+<span class="fc" id="L112">    }</span>
+
+    /**
+     * Loads all the suppression rules files configured in the {@link Settings}.
+     *
+     * @throws SuppressionParseException thrown if the XML cannot be parsed.
+     */
+    private void loadSuppressionData() throws SuppressionParseException {
+<span class="fc" id="L120">        final List&lt;SuppressionRule&gt; ruleList = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L121">        final SuppressionParser parser = new SuppressionParser();</span>
+<span class="fc" id="L122">        final String[] suppressionFilePaths = getSettings().getArray(Settings.KEYS.SUPPRESSION_FILE);</span>
+<span class="fc" id="L123">        final List&lt;String&gt; failedLoadingFiles = new ArrayList&lt;&gt;();</span>
+<span class="pc bpc" id="L124" title="1 of 4 branches missed.">        if (suppressionFilePaths != null &amp;&amp; suppressionFilePaths.length &gt; 0) {</span>
+            // Load all the suppression file paths
+<span class="fc bfc" id="L126" title="All 2 branches covered.">            for (final String suppressionFilePath : suppressionFilePaths) {</span>
+                try {
+<span class="fc" id="L128">                    ruleList.addAll(loadSuppressionFile(parser, suppressionFilePath));</span>
+<span class="nc" id="L129">                } catch (SuppressionParseException ex) {</span>
+<span class="nc" id="L130">                    final String msg = String.format(&quot;Failed to load %s, caused by %s. &quot;, suppressionFilePath, ex.getMessage());</span>
+<span class="nc" id="L131">                    failedLoadingFiles.add(msg);</span>
+<span class="fc" id="L132">                }</span>
+            }
+        }
+<span class="fc" id="L135">        LOGGER.debug(&quot;{} suppression rules were loaded.&quot;, ruleList.size());</span>
+<span class="fc" id="L136">        rules.addAll(ruleList);</span>
+<span class="pc bpc" id="L137" title="1 of 2 branches missed.">        if (!failedLoadingFiles.isEmpty()) {</span>
+<span class="nc" id="L138">            LOGGER.debug(&quot;{} suppression files failed to load.&quot;, failedLoadingFiles.size());</span>
+<span class="nc" id="L139">            final StringBuilder sb = new StringBuilder();</span>
+<span class="nc" id="L140">            failedLoadingFiles.forEach((item) -&gt; {</span>
+<span class="nc" id="L141">                sb.append(item);</span>
+<span class="nc" id="L142">            });</span>
+<span class="nc" id="L143">            throw new SuppressionParseException(sb.toString());</span>
+        }
+<span class="fc" id="L145">    }</span>
+
+    /**
+     * Loads all the base suppression rules files.
+     *
+     * @throws SuppressionParseException thrown if the XML cannot be parsed.
+     */
+    private void loadSuppressionBaseData() throws SuppressionParseException {
+<span class="fc" id="L153">        final SuppressionParser parser = new SuppressionParser();</span>
+        final List&lt;SuppressionRule&gt; ruleList;
+        try {
+<span class="fc" id="L156">            final InputStream in = FileUtils.getResourceAsStream(&quot;dependencycheck-base-suppression.xml&quot;);</span>
+<span class="fc" id="L157">            ruleList = parser.parseSuppressionRules(in);</span>
+<span class="nc" id="L158">        } catch (SAXException ex) {</span>
+<span class="nc" id="L159">            throw new SuppressionParseException(&quot;Unable to parse the base suppression data file&quot;, ex);</span>
+<span class="fc" id="L160">        }</span>
+<span class="fc" id="L161">        rules.addAll(ruleList);</span>
+<span class="fc" id="L162">    }</span>
+
+    /**
+     * Load a single suppression rules file from the path provided using the
+     * parser provided.
+     *
+     * @param parser the parser to use for loading the file
+     * @param suppressionFilePath the path to load
+     * @return the list of loaded suppression rules
+     * @throws SuppressionParseException thrown if the suppression file cannot
+     * be loaded and parsed.
+     */
+    private List&lt;SuppressionRule&gt; loadSuppressionFile(final SuppressionParser parser,
+            final String suppressionFilePath) throws SuppressionParseException {
+<span class="fc" id="L176">        LOGGER.debug(&quot;Loading suppression rules from '{}'&quot;, suppressionFilePath);</span>
+<span class="fc" id="L177">        final List&lt;SuppressionRule&gt; list = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L178">        File file = null;</span>
+<span class="fc" id="L179">        boolean deleteTempFile = false;</span>
+        try {
+<span class="fc" id="L181">            final Pattern uriRx = Pattern.compile(&quot;^(https?|file)\\:.*&quot;, Pattern.CASE_INSENSITIVE);</span>
+<span class="pc bpc" id="L182" title="1 of 2 branches missed.">            if (uriRx.matcher(suppressionFilePath).matches()) {</span>
+<span class="nc" id="L183">                deleteTempFile = true;</span>
+<span class="nc" id="L184">                file = getSettings().getTempFile(&quot;suppression&quot;, &quot;xml&quot;);</span>
+<span class="nc" id="L185">                final URL url = new URL(suppressionFilePath);</span>
+<span class="nc" id="L186">                final Downloader downloader = new Downloader(getSettings());</span>
+                try {
+<span class="nc" id="L188">                    downloader.fetchFile(url, file, false);</span>
+<span class="nc" id="L189">                } catch (DownloadFailedException ex) {</span>
+<span class="nc" id="L190">                    LOGGER.trace(&quot;Failed download - first attempt&quot;, ex);</span>
+<span class="nc" id="L191">                    downloader.fetchFile(url, file, true);</span>
+<span class="nc" id="L192">                }</span>
+<span class="nc" id="L193">            } else {</span>
+<span class="fc" id="L194">                file = new File(suppressionFilePath);</span>
+
+<span class="pc bpc" id="L196" title="1 of 2 branches missed.">                if (!file.exists()) {</span>
+<span class="nc" id="L197">                    try (InputStream suppressionsFromClasspath = FileUtils.getResourceAsStream(suppressionFilePath)) {</span>
+<span class="nc bnc" id="L198" title="All 2 branches missed.">                        if (suppressionsFromClasspath != null) {</span>
+<span class="nc" id="L199">                            deleteTempFile = true;</span>
+<span class="nc" id="L200">                            file = getSettings().getTempFile(&quot;suppression&quot;, &quot;xml&quot;);</span>
+                            try {
+<span class="nc" id="L202">                                org.apache.commons.io.FileUtils.copyInputStreamToFile(suppressionsFromClasspath, file);</span>
+<span class="nc" id="L203">                            } catch (IOException ex) {</span>
+<span class="nc" id="L204">                                throwSuppressionParseException(&quot;Unable to locate suppressions file in classpath&quot;, ex, suppressionFilePath);</span>
+<span class="nc" id="L205">                            }</span>
+                        }
+                    }
+                }
+            }
+<span class="pc bpc" id="L210" title="1 of 2 branches missed.">            if (file != null) {</span>
+<span class="pc bpc" id="L211" title="1 of 2 branches missed.">                if (!file.exists()) {</span>
+<span class="nc" id="L212">                    final String msg = String.format(&quot;Suppression file '%s' does not exist&quot;, file.getPath());</span>
+<span class="nc" id="L213">                    LOGGER.warn(msg);</span>
+<span class="nc" id="L214">                    throw new SuppressionParseException(msg);</span>
+                }
+                try {
+<span class="fc" id="L217">                    list.addAll(parser.parseSuppressionRules(file));</span>
+<span class="nc" id="L218">                } catch (SuppressionParseException ex) {</span>
+<span class="nc" id="L219">                    LOGGER.warn(&quot;Unable to parse suppression xml file '{}'&quot;, file.getPath());</span>
+<span class="nc" id="L220">                    LOGGER.warn(ex.getMessage());</span>
+<span class="nc" id="L221">                    throw ex;</span>
+<span class="fc" id="L222">                }</span>
+            }
+<span class="nc" id="L224">        } catch (DownloadFailedException ex) {</span>
+<span class="nc" id="L225">            throwSuppressionParseException(&quot;Unable to fetch the configured suppression file&quot;, ex, suppressionFilePath);</span>
+<span class="nc" id="L226">        } catch (MalformedURLException ex) {</span>
+<span class="nc" id="L227">            throwSuppressionParseException(&quot;Configured suppression file has an invalid URL&quot;, ex, suppressionFilePath);</span>
+<span class="nc" id="L228">        } catch (SuppressionParseException ex) {</span>
+<span class="nc" id="L229">            throw ex;</span>
+<span class="nc" id="L230">        } catch (IOException ex) {</span>
+<span class="nc" id="L231">            throwSuppressionParseException(&quot;Unable to create temp file for suppressions&quot;, ex, suppressionFilePath);</span>
+        } finally {
+<span class="pc bpc" id="L233" title="3 of 4 branches missed.">            if (deleteTempFile &amp;&amp; file != null) {</span>
+<span class="nc" id="L234">                FileUtils.delete(file);</span>
+            }
+        }
+<span class="fc" id="L237">        return list;</span>
+    }
+
+    /**
+     * Utility method to throw parse exceptions.
+     *
+     * @param message the exception message
+     * @param exception the cause of the exception
+     * @param suppressionFilePath the path file
+     * @throws SuppressionParseException throws the generated
+     * SuppressionParseException
+     */
+    private void throwSuppressionParseException(String message, Exception exception, String suppressionFilePath) throws SuppressionParseException {
+<span class="nc" id="L250">        LOGGER.warn(String.format(message + &quot;'%s'&quot;, suppressionFilePath));</span>
+<span class="nc" id="L251">        LOGGER.debug(&quot;&quot;, exception);</span>
+<span class="nc" id="L252">        throw new SuppressionParseException(message, exception);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.2.201808211720</span></div></body></html>

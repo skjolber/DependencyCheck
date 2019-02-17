@@ -1,0 +1,357 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../jacoco-resources/report.gif" type="image/gif"/><title>CVEJSON40Min.java</title><link rel="stylesheet" href="../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../index.html" class="el_report">Dependency-Check Ant Task</a> &gt; <a href="../index.html" class="el_bundle">dependency-check-core</a> &gt; <a href="index.source.html" class="el_package">org.owasp.dependencycheck.data.nvd.json</a> &gt; <span class="el_source">CVEJSON40Min.java</span></div><h1>CVEJSON40Min.java</h1><pre class="source lang-java linenums">
+package org.owasp.dependencycheck.data.nvd.json;
+
+import java.util.HashMap;
+import java.util.Map;
+import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+
+<span class="fc" id="L12">public class CVEJSON40Min {</span>
+
+    /**
+     * 
+     * (Required)
+     * 
+     */
+    @SerializedName(&quot;data_type&quot;)
+    @Expose
+    private CVEJSON40Min.DataType dataType;
+    /**
+     * 
+     * (Required)
+     * 
+     */
+    @SerializedName(&quot;data_format&quot;)
+    @Expose
+    private CVEJSON40Min.DataFormat dataFormat;
+    /**
+     * 
+     * (Required)
+     * 
+     */
+    @SerializedName(&quot;data_version&quot;)
+    @Expose
+    private CVEJSON40Min.DataVersion dataVersion;
+    /**
+     * 
+     * (Required)
+     * 
+     */
+    @SerializedName(&quot;CVE_data_meta&quot;)
+    @Expose
+    private CVEDataMeta cVEDataMeta;
+    /**
+     * 
+     * (Required)
+     * 
+     */
+    @SerializedName(&quot;affects&quot;)
+    @Expose
+    private Affects affects;
+    /**
+     * 
+     * (Required)
+     * 
+     */
+    @SerializedName(&quot;problemtype&quot;)
+    @Expose
+    private Problemtype problemtype;
+    /**
+     * 
+     * (Required)
+     * 
+     */
+    @SerializedName(&quot;references&quot;)
+    @Expose
+    private References references;
+    /**
+     * 
+     * (Required)
+     * 
+     */
+    @SerializedName(&quot;description&quot;)
+    @Expose
+    private Description_ description;
+
+    /**
+     * 
+     * (Required)
+     * 
+     */
+    public CVEJSON40Min.DataType getDataType() {
+<span class="nc" id="L85">        return dataType;</span>
+    }
+
+    /**
+     * 
+     * (Required)
+     * 
+     */
+    public void setDataType(CVEJSON40Min.DataType dataType) {
+<span class="nc" id="L94">        this.dataType = dataType;</span>
+<span class="nc" id="L95">    }</span>
+
+    /**
+     * 
+     * (Required)
+     * 
+     */
+    public CVEJSON40Min.DataFormat getDataFormat() {
+<span class="nc" id="L103">        return dataFormat;</span>
+    }
+
+    /**
+     * 
+     * (Required)
+     * 
+     */
+    public void setDataFormat(CVEJSON40Min.DataFormat dataFormat) {
+<span class="nc" id="L112">        this.dataFormat = dataFormat;</span>
+<span class="nc" id="L113">    }</span>
+
+    /**
+     * 
+     * (Required)
+     * 
+     */
+    public CVEJSON40Min.DataVersion getDataVersion() {
+<span class="nc" id="L121">        return dataVersion;</span>
+    }
+
+    /**
+     * 
+     * (Required)
+     * 
+     */
+    public void setDataVersion(CVEJSON40Min.DataVersion dataVersion) {
+<span class="nc" id="L130">        this.dataVersion = dataVersion;</span>
+<span class="nc" id="L131">    }</span>
+
+    /**
+     * 
+     * (Required)
+     * 
+     */
+    public CVEDataMeta getCVEDataMeta() {
+<span class="fc" id="L139">        return cVEDataMeta;</span>
+    }
+
+    /**
+     * 
+     * (Required)
+     * 
+     */
+    public void setCVEDataMeta(CVEDataMeta cVEDataMeta) {
+<span class="nc" id="L148">        this.cVEDataMeta = cVEDataMeta;</span>
+<span class="nc" id="L149">    }</span>
+
+    /**
+     * 
+     * (Required)
+     * 
+     */
+    public Affects getAffects() {
+<span class="nc" id="L157">        return affects;</span>
+    }
+
+    /**
+     * 
+     * (Required)
+     * 
+     */
+    public void setAffects(Affects affects) {
+<span class="nc" id="L166">        this.affects = affects;</span>
+<span class="nc" id="L167">    }</span>
+
+    /**
+     * 
+     * (Required)
+     * 
+     */
+    public Problemtype getProblemtype() {
+<span class="fc" id="L175">        return problemtype;</span>
+    }
+
+    /**
+     * 
+     * (Required)
+     * 
+     */
+    public void setProblemtype(Problemtype problemtype) {
+<span class="nc" id="L184">        this.problemtype = problemtype;</span>
+<span class="nc" id="L185">    }</span>
+
+    /**
+     * 
+     * (Required)
+     * 
+     */
+    public References getReferences() {
+<span class="fc" id="L193">        return references;</span>
+    }
+
+    /**
+     * 
+     * (Required)
+     * 
+     */
+    public void setReferences(References references) {
+<span class="nc" id="L202">        this.references = references;</span>
+<span class="nc" id="L203">    }</span>
+
+    /**
+     * 
+     * (Required)
+     * 
+     */
+    public Description_ getDescription() {
+<span class="fc" id="L211">        return description;</span>
+    }
+
+    /**
+     * 
+     * (Required)
+     * 
+     */
+    public void setDescription(Description_ description) {
+<span class="nc" id="L220">        this.description = description;</span>
+<span class="nc" id="L221">    }</span>
+
+    @Override
+    public String toString() {
+<span class="nc" id="L225">        return new ToStringBuilder(this).append(&quot;dataType&quot;, dataType).append(&quot;dataFormat&quot;, dataFormat).append(&quot;dataVersion&quot;, dataVersion).append(&quot;cVEDataMeta&quot;, cVEDataMeta).append(&quot;affects&quot;, affects).append(&quot;problemtype&quot;, problemtype).append(&quot;references&quot;, references).append(&quot;description&quot;, description).toString();</span>
+    }
+
+    @Override
+    public int hashCode() {
+<span class="nc" id="L230">        return new HashCodeBuilder().append(references).append(dataVersion).append(dataFormat).append(dataType).append(cVEDataMeta).append(affects).append(description).append(problemtype).toHashCode();</span>
+    }
+
+    @Override
+    public boolean equals(Object other) {
+<span class="nc bnc" id="L235" title="All 2 branches missed.">        if (other == this) {</span>
+<span class="nc" id="L236">            return true;</span>
+        }
+<span class="nc bnc" id="L238" title="All 2 branches missed.">        if ((other instanceof CVEJSON40Min) == false) {</span>
+<span class="nc" id="L239">            return false;</span>
+        }
+<span class="nc" id="L241">        CVEJSON40Min rhs = ((CVEJSON40Min) other);</span>
+<span class="nc" id="L242">        return new EqualsBuilder().append(references, rhs.references).append(dataVersion, rhs.dataVersion).append(dataFormat, rhs.dataFormat).append(dataType, rhs.dataType).append(cVEDataMeta, rhs.cVEDataMeta).append(affects, rhs.affects).append(description, rhs.description).append(problemtype, rhs.problemtype).isEquals();</span>
+    }
+
+<span class="fc" id="L245">    public enum DataFormat {</span>
+
+<span class="fc" id="L247">        @SerializedName(&quot;MITRE&quot;)</span>
+        MITRE(&quot;MITRE&quot;);
+        private final String value;
+<span class="fc" id="L250">        private final static Map&lt;String, CVEJSON40Min.DataFormat&gt; CONSTANTS = new HashMap&lt;String, CVEJSON40Min.DataFormat&gt;();</span>
+
+        static {
+<span class="fc bfc" id="L253" title="All 2 branches covered.">            for (CVEJSON40Min.DataFormat c: values()) {</span>
+<span class="fc" id="L254">                CONSTANTS.put(c.value, c);</span>
+            }
+<span class="fc" id="L256">        }</span>
+
+<span class="fc" id="L258">        private DataFormat(String value) {</span>
+<span class="fc" id="L259">            this.value = value;</span>
+<span class="fc" id="L260">        }</span>
+
+        @Override
+        public String toString() {
+<span class="nc" id="L264">            return this.value;</span>
+        }
+
+        public String value() {
+<span class="nc" id="L268">            return this.value;</span>
+        }
+
+        public static CVEJSON40Min.DataFormat fromValue(String value) {
+<span class="nc" id="L272">            CVEJSON40Min.DataFormat constant = CONSTANTS.get(value);</span>
+<span class="nc bnc" id="L273" title="All 2 branches missed.">            if (constant == null) {</span>
+<span class="nc" id="L274">                throw new IllegalArgumentException(value);</span>
+            } else {
+<span class="nc" id="L276">                return constant;</span>
+            }
+        }
+
+    }
+
+<span class="fc" id="L282">    public enum DataType {</span>
+
+<span class="fc" id="L284">        @SerializedName(&quot;CVE&quot;)</span>
+        CVE(&quot;CVE&quot;);
+        private final String value;
+<span class="fc" id="L287">        private final static Map&lt;String, CVEJSON40Min.DataType&gt; CONSTANTS = new HashMap&lt;String, CVEJSON40Min.DataType&gt;();</span>
+
+        static {
+<span class="fc bfc" id="L290" title="All 2 branches covered.">            for (CVEJSON40Min.DataType c: values()) {</span>
+<span class="fc" id="L291">                CONSTANTS.put(c.value, c);</span>
+            }
+<span class="fc" id="L293">        }</span>
+
+<span class="fc" id="L295">        private DataType(String value) {</span>
+<span class="fc" id="L296">            this.value = value;</span>
+<span class="fc" id="L297">        }</span>
+
+        @Override
+        public String toString() {
+<span class="nc" id="L301">            return this.value;</span>
+        }
+
+        public String value() {
+<span class="nc" id="L305">            return this.value;</span>
+        }
+
+        public static CVEJSON40Min.DataType fromValue(String value) {
+<span class="nc" id="L309">            CVEJSON40Min.DataType constant = CONSTANTS.get(value);</span>
+<span class="nc bnc" id="L310" title="All 2 branches missed.">            if (constant == null) {</span>
+<span class="nc" id="L311">                throw new IllegalArgumentException(value);</span>
+            } else {
+<span class="nc" id="L313">                return constant;</span>
+            }
+        }
+
+    }
+
+<span class="fc" id="L319">    public enum DataVersion {</span>
+
+<span class="fc" id="L321">        @SerializedName(&quot;4.0&quot;)</span>
+        _4_0(&quot;4.0&quot;);
+        private final String value;
+<span class="fc" id="L324">        private final static Map&lt;String, CVEJSON40Min.DataVersion&gt; CONSTANTS = new HashMap&lt;String, CVEJSON40Min.DataVersion&gt;();</span>
+
+        static {
+<span class="fc bfc" id="L327" title="All 2 branches covered.">            for (CVEJSON40Min.DataVersion c: values()) {</span>
+<span class="fc" id="L328">                CONSTANTS.put(c.value, c);</span>
+            }
+<span class="fc" id="L330">        }</span>
+
+<span class="fc" id="L332">        private DataVersion(String value) {</span>
+<span class="fc" id="L333">            this.value = value;</span>
+<span class="fc" id="L334">        }</span>
+
+        @Override
+        public String toString() {
+<span class="nc" id="L338">            return this.value;</span>
+        }
+
+        public String value() {
+<span class="nc" id="L342">            return this.value;</span>
+        }
+
+        public static CVEJSON40Min.DataVersion fromValue(String value) {
+<span class="nc" id="L346">            CVEJSON40Min.DataVersion constant = CONSTANTS.get(value);</span>
+<span class="nc bnc" id="L347" title="All 2 branches missed.">            if (constant == null) {</span>
+<span class="nc" id="L348">                throw new IllegalArgumentException(value);</span>
+            } else {
+<span class="nc" id="L350">                return constant;</span>
+            }
+        }
+
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.2.201808211720</span></div></body></html>
