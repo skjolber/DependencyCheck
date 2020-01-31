@@ -110,6 +110,9 @@ public class NvdCveUpdater implements CachedWebDataSource {
      */
     @Override
     public synchronized boolean update(Engine engine) throws UpdateException {
+    	return update(engine, true);
+    }
+    public synchronized boolean update(Engine engine, boolean updates) throws UpdateException {
         this.settings = engine.getSettings();
         this.cveDb = engine.getDatabase();
         if (isUpdateConfiguredFalse()) {
@@ -122,7 +125,7 @@ public class NvdCveUpdater implements CachedWebDataSource {
                 final List<NvdCveInfo> updateable = getUpdatesNeeded();
                 if (!updateable.isEmpty()) {
                     initializeExecutorServices();
-                    performUpdate(updateable);
+                    performUpdate(updateable, updates);
                     updatesMade = true;
                 }
                 //all dates in the db are now stored in seconds as opposed to previously milliseconds.
@@ -169,15 +172,20 @@ public class NvdCveUpdater implements CachedWebDataSource {
      * CVE XML data.
      */
     protected void initializeExecutorServices() {
-        final int downloadPoolSize;
-        final int max = settings.getInt(Settings.KEYS.MAX_DOWNLOAD_THREAD_POOL_SIZE, 3);
+        int processingPoolSize = PROCESSING_THREAD_POOL_SIZE;
+        int downloadPoolSize;
+        int max = settings.getInt(Settings.KEYS.MAX_DOWNLOAD_THREAD_POOL_SIZE, 3);
         if (DOWNLOAD_THREAD_POOL_SIZE > max) {
             downloadPoolSize = max;
         } else {
             downloadPoolSize = DOWNLOAD_THREAD_POOL_SIZE;
         }
+        
+        downloadPoolSize = 1;
+        processingPoolSize = 1;
+        
         downloadExecutorService = Executors.newFixedThreadPool(downloadPoolSize);
-        processingExecutorService = Executors.newFixedThreadPool(PROCESSING_THREAD_POOL_SIZE);
+        processingExecutorService = Executors.newFixedThreadPool(processingPoolSize);
         LOGGER.debug("#download   threads: {}", downloadPoolSize);
         LOGGER.debug("#processing threads: {}", PROCESSING_THREAD_POOL_SIZE);
     }
@@ -238,11 +246,12 @@ public class NvdCveUpdater implements CachedWebDataSource {
      *
      * @param updateable a collection of NVD CVE data file references that need
      * to be downloaded and processed to update the database
+     * @param updates 
      * @throws UpdateException is thrown if there is an error updating the
      * database
      */
     @SuppressWarnings("FutureReturnValueIgnored")
-    private void performUpdate(List<NvdCveInfo> updateable) throws UpdateException {
+    private void performUpdate(List<NvdCveInfo> updateable, boolean updates) throws UpdateException {
         if (updateable.isEmpty()) {
             return;
         }
@@ -299,29 +308,31 @@ public class NvdCveUpdater implements CachedWebDataSource {
             }
         }
 
-        if (runLast != null) {
-            final Future<Future<ProcessTask>> modified = downloadExecutorService.submit(runLast);
-            final Future<ProcessTask> task;
-            try {
-                task = modified.get();
-                final ProcessTask last = task.get();
-                if (last.getException() != null) {
-                    throw last.getException();
-                }
-            } catch (InterruptedException ex) {
-                LOGGER.debug("Thread was interrupted during download", ex);
-                Thread.currentThread().interrupt();
-                throw new UpdateException("The download was interrupted", ex);
-            } catch (ExecutionException ex) {
-                LOGGER.debug("Thread was interrupted during download execution", ex);
-                throw new UpdateException("The execution of the download was interrupted", ex);
-            }
-        }
-
-        try {
-            cveDb.cleanupDatabase();
-        } catch (DatabaseException ex) {
-            throw new UpdateException(ex.getMessage(), ex.getCause());
+        if(updates) {
+	        if (runLast != null) {
+	            final Future<Future<ProcessTask>> modified = downloadExecutorService.submit(runLast);
+	            final Future<ProcessTask> task;
+	            try {
+	                task = modified.get();
+	                final ProcessTask last = task.get();
+	                if (last.getException() != null) {
+	                    throw last.getException();
+	                }
+	            } catch (InterruptedException ex) {
+	                LOGGER.debug("Thread was interrupted during download", ex);
+	                Thread.currentThread().interrupt();
+	                throw new UpdateException("The download was interrupted", ex);
+	            } catch (ExecutionException ex) {
+	                LOGGER.debug("Thread was interrupted during download execution", ex);
+	                throw new UpdateException("The execution of the download was interrupted", ex);
+	            }
+	        }
+	
+	        try {
+	            cveDb.cleanupDatabase();
+	        } catch (DatabaseException ex) {
+	            throw new UpdateException(ex.getMessage(), ex.getCause());
+	        }
         }
     }
 

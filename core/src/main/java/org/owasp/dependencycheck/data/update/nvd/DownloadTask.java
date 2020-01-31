@@ -121,7 +121,7 @@ public class DownloadTask implements Callable<Future<ProcessTask>> {
     public Future<ProcessTask> call() throws Exception {
         try {
             final URL url1 = new URL(nvdCveInfo.getUrl());
-            LOGGER.info("Download Started for NVD CVE - {}", nvdCveInfo.getId());
+            LOGGER.info("Download Started for NVD CVE - {} at {}", nvdCveInfo.getId(), nvdCveInfo.getUrl());
             final long startDownload = System.currentTimeMillis();
             try {
                 final Downloader downloader = new Downloader(settings);
@@ -172,6 +172,7 @@ public class DownloadTask implements Callable<Future<ProcessTask>> {
      * otherwise <code>false</code>
      */
     public boolean isModified() {
+    	System.out.println(file);
         return StringUtils.containsIgnoreCase(file.toString(), "modified");
     }
 }

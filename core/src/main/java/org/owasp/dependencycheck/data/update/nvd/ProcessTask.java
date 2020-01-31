@@ -127,7 +127,7 @@ public class ProcessTask implements Callable<ProcessTask> {
      * configuration exception
      * @throws IOException is thrown if there is a IO Exception
      * @throws SQLException is thrown if there is a SQL exception
-     * @throws DatabaseException is thrown if there is a database exception
+     * @throws DatabaseException is thrown i	f there is a database exception
      * @throws ClassNotFoundException thrown if the h2 database driver cannot be
      * loaded
      * @throws UpdateException thrown if the file could not be found

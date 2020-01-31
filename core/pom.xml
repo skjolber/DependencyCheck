@@ -108,7 +108,10 @@ Copyright (c) 2012 Jeremy Long. All Rights Reserved.
                     <outputDirectory>${project.build.directory}/generated-sources/java</outputDirectory>
                     <includeGetters>true</includeGetters>
                     <annotationStyle>gson</annotationStyle>
+                    <includeHashcodeAndEquals>false</includeHashcodeAndEquals>
                     <targetPackage>org.owasp.dependencycheck.data.nvd.json</targetPackage>
+					<includeAdditionalProperties>false</includeAdditionalProperties>                    
+                    <includeToString>false</includeToString>
                 </configuration>
                 <executions>
                     <execution>
@@ -265,6 +268,11 @@ Copyright (c) 2012 Jeremy Long. All Rights Reserved.
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
         </dependency>
+        <dependency>
+    <groupId>com.opencsv</groupId>
+    <artifactId>opencsv</artifactId>
+    <version>4.1</version>
+</dependency>
         <dependency>
             <groupId>com.h3xstream.retirejs</groupId>
             <artifactId>retirejs-core</artifactId>

@@ -351,8 +351,8 @@ public final class ConnectionFactory {
             throws DatabaseException {
 
         if (connectionString.startsWith("jdbc:h2:file:")) {
-            LOGGER.debug("Updating database structure");
             final String updateFile = String.format(DB_STRUCTURE_UPDATE_RESOURCE, currentDbVersion.toString());
+            LOGGER.debug("Updating database structure {}", updateFile);
             try (InputStream is = FileUtils.getResourceAsStream(updateFile)) {
                 if (is == null) {
                     throw new DatabaseException(String.format("Unable to load update file '%s'", updateFile));

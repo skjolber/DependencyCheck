@@ -678,7 +678,7 @@ public final class Settings {
     public synchronized void cleanup(boolean deleteTemporary) {
         if (deleteTemporary && tempDirectory != null && tempDirectory.exists()) {
             LOGGER.debug("Deleting ALL temporary files from `{}`", tempDirectory.toString());
-            FileUtils.delete(tempDirectory);
+            //FileUtils.delete(tempDirectory);
             tempDirectory = null;
         }
     }
