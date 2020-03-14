@@ -153,11 +153,13 @@
     "description": {
       "type": "object",
       "required": [ "description_data" ],
+      "existingJavaType" : "org.owasp.dependencycheck.data.nvd.json.MyDescription",
       "properties": {
         "description_data": {
           "type": "array",
           "minItems": 0,
           "items": { "$ref": "#/definitions/lang_string" }
+          
         }
       }
     }

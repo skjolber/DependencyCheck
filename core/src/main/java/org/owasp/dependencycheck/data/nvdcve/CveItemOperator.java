@@ -1,6 +1,5 @@
 package org.owasp.dependencycheck.data.nvdcve;
 
-import java.util.List;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
